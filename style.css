@@ -949,7 +949,7 @@ footer {
         display: flex;
         flex-direction: row;
         justify-content: center;
-        gap: 20rem;
+        gap: 4rem;
         padding: 20px;
     }
 
@@ -1033,14 +1033,17 @@ footer {
     }
 
     .about-years {
-        right: -30px;
+        right: 0;
+        transform: translateX(30px);
         bottom: 40px;
     }
 
     .about-img img {
+        max-width: 100%;
         width: 610px;
         height: 600px;
     }
+
 
     .about-img img:hover {
         background: rgba(20, 20, 20, 0.85);
@@ -1061,6 +1064,7 @@ footer {
         width: 100%;
         align-items: stretch;
         margin-bottom: 10rem;
+        overflow-x: hidden;
     }
 
     .location {
@@ -1146,17 +1150,6 @@ footer {
     .btn-outline:hover {
         background: rgba(197, 160, 89, 0.1);
     }
-
-
-
-
-
-
-
-
-
-
-
 
     @keyframes pulseGlow {
         0% {
