@@ -1,0 +1,8 @@
+<h1>Dashboard Barbeiro</h1>
+
+<ul>
+  {% for a in agendamentos %}
+    <li>{{ a.cliente.username }} - {{ a.servico.nome }} - {{ a.data }} {{ a.horario }}</li>
+  {% endfor %}
+</ul>
+<a href="/accounts/logout/">Sair</a>

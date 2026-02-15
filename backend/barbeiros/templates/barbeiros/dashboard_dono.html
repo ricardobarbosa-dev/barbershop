@@ -1,0 +1,6 @@
+<h1>Dashboard Dono2</h1>
+<ul>
+  {% for b in barbeiros %}
+    <li>{{ b.nome }} - Agendamentos: {{ b.agendamentos.count }}</li>
+  {% endfor %}
+</ul>

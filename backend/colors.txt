@@ -1,0 +1,18 @@
+Paleta de Cores Premium Dark Barbershop
+Amarelo Vibrante (Destaque Principal): #FFD700 ou #FFCC00
+Uso: Botões de ação principal (CTA), indicadores de status ativos e barras de progresso.
+Preto Absoluto (Fundo Primário): #000000
+Uso: Fundo principal da aplicação para criar profundidade.
+Grafite / Charcoal (Superfícies e Cards): #121212 ou #1A1A1A
+Uso: Fundo de cards, barras laterais e elementos que precisam se destacar levemente do fundo preto.
+Cinza Médio (Bordas e Textos Secundários): #333333 ou #2B2B2B
+Uso: Linhas divisórias, bordas de tabelas e ícones desativados.
+Branco Puro / Off-White (Textos e Títulos): #FFFFFF ou #F5F5F5
+Uso: Títulos principais e informações críticas para garantir legibilidade máxima.
+Cinza Suave (Textos de Apoio): #A0A0A0
+Uso: Descrições, legendas e textos informativos menos importantes.
+Vermelho Profundo (Ações Destrutivas): #B22222 (em opacidade ou bordas)
+Uso: Botões de "Cancelar" ou alertas, geralmente aplicados de forma sutil para não quebrar a harmonia.
+
+
+https://stitch.withgoogle.com/preview/10096307928553427735?node-id=d80386e800204e6c932b569a754039c6

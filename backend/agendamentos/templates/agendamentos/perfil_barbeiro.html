@@ -1,0 +1,124 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}
+  Perfil do Barbeiro
+{% endblock %}
+
+{% block breadcrumb %}
+  Dashboard / <strong>Barbeiro</strong>
+{% endblock %}
+
+{% block content %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link rel="stylesheet" href="{% static 'accounts/css/perfil.css' %}" />
+
+  <div class="container-card">
+    <section id="card" class="principal">
+      <header class="profile-header">
+        <div class="avatar-container">
+          <img src="{{ perfil.foto.url }}" alt="{{ barbeiro.get_full_name }}" class="profile-img" />
+          <div class="verified-badge">
+            <svg viewBox="0 0 20 20" fill="currentColor">
+              <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
+            </svg>
+          </div>
+        </div>
+
+        <h1 class="profile-name">{{ barbeiro.get_full_name }}</h1>
+        <p class="profile-title" style="color: #FFD700;">Barbeiro Profissional</p>
+
+        {% if perfil.localizacao %}
+          <p class="location">
+            <i class="fas fa-map-marker-alt"></i> {{ perfil.localizacao }}
+          </p>
+        {% endif %}
+
+        <div class="social-links-container">
+          {% if perfil.whatsapp %}
+            <a href="https://wa.me/{{ perfil.whatsapp }}" target="_blank" class="social-icon icon-whatsapp" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+          {% endif %}
+
+          {% if perfil.instagram %}
+            <a href="https://instagram.com/{{ perfil.instagram }}" target="_blank" class="social-icon icon-instagram" title="Instagram"><i class="fab fa-instagram"></i></a>
+          {% endif %}
+
+          {% if perfil.facebook %}
+            <a href="https://facebook.com/{{ perfil.facebook }}" target="_blank" class="social-icon icon-facebook" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+          {% endif %}
+
+          {% if perfil.site_pessoal %}
+            <a href="{{ perfil.site_pessoal }}" target="_blank" class="social-icon icon-site" title="Site Pessoal"><i class="fas fa-globe"></i></a>
+          {% endif %}
+        </div>
+      </header>
+
+      <section class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-value">05</span>
+          <span class="stat-label">ANOS EXP.</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">120+</span>
+          <span class="stat-label">CORTES FEITOS</span>
+        </div>
+      </section>
+
+      <section class="satisfaction-section">
+        <div class="section-header">
+          <h2>Avaliações</h2>
+          <div class="mini-rating">★ {{ media|floatformat:1 }}</div>
+        </div>
+
+        <div class="rating-card">
+          <div class="rating-summary">
+            <div class="rating-big-number">
+              <span class="number">{{ media|floatformat:1 }}</span>
+              <div class="stars-row" style="color: #FFD700; display: flex; gap: 2px;">
+                {% for i in star_range %}
+                  {% if i <= media_int %}
+                    ★
+                  {% else %}
+                    ☆
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+            <div class="rating-count">
+              <p>Média Geral</p>
+              <strong>{{ total }} avaliações</strong>
+            </div>
+          </div>
+        </div>
+
+        {% if user.is_authenticated %}
+          <div class="user-rating-box" style="margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px dashed rgba(255,255,255,0.1);">
+            {% if ja_avaliou %}
+              <p style="color: #00ff88; text-align: center; font-size: 0.85rem; margin: 0;">✓ Você já avaliou este perfil.</p>
+            {% else %}
+              <p style="color: #eee; font-size: 0.9rem; margin-bottom: 10px; text-align: center;">Deixe sua nota:</p>
+              <form action="{% url 'avaliar_barbeiro' barbeiro.id %}" method="POST" class="rating-form">
+                {% csrf_token %}
+                <div class="stars-input-wrapper" style="display: flex; justify-content: center; gap: 5px;">
+                  {% for i in star_range %}
+                    <input type="radio" id="star{{ i }}" name="nota" value="{{ i }}" onchange="this.form.submit()" class="hidden-input" style="display: none;" required />
+                    <label for="star{{ i }}" class="star-label" style="cursor: pointer; font-size: 1.5rem; color: #FFD700;">☆</label>
+                  {% endfor %}
+                </div>
+              </form>
+            {% endif %}
+          </div>
+        {% endif %}
+      </section>
+
+      <div style="margin-top: 20px;">
+        <button class="btn-primary" style="margin-top: 20px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+            <path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z" />
+          </svg>
+          <a href="{% url 'criar_agendamento' %}" style="color: inherit; text-decoration: none;">Novo Agendamento</a>
+        </button>
+      </div>
+    </section>
+  </div>
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}
+  Dashboard do Barbeiro
+{% endblock %}
+
+{% block breadcrumb %}
+  Dashboard / <strong>Barbeiro</strong>
+{% endblock %}
+{% block content %}
+  <link rel="stylesheet" href="{% static 'agendamentos/css/dashboard_barbeiro.css' %}" />
+
+  <div class="container-card" style="display: block;">
+    <header class="header-text">
+      <h1>DASH <span>BOARD</span></h1>
+      <p>Todos os dados importantes estão aqui.</p>
+    </header>
+    <section id="card" class="principal">
+      <h3 class="section-title">RESUMO DE HOJE</h3>
+      <div class="summary-grid">
+        <div class="card-mini">
+          <div class="card-header-mini">
+            <span class="icon">
+              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                <path d="M760-120 480-400l-94 94q8 15 11 32t3 34q0 66-47 113T240-80q-66 0-113-47T80-240q0-66 47-113t113-47q17 0 34 3t32 11l94-94-94-94q-15 8-32 11t-34 3q-66 0-113-47T80-720q0-66 47-113t113-47q66 0 113 47t47 113q0 17-3 34t-11 32l494 494v40H760ZM600-520l-80-80 240-240h120v40L600-520ZM296.5-663.5Q320-687 320-720t-23.5-56.5Q273-800 240-800t-56.5 23.5Q160-753 160-720t23.5 56.5Q207-640 240-640t56.5-23.5ZM494-466q6-6 6-14t-6-14q-6-6-14-6t-14 6q-6 6-6 14t6 14q6 6 14 6t14-6ZM296.5-183.5Q320-207 320-240t-23.5-56.5Q273-320 240-320t-56.5 23.5Q160-273 160-240t23.5 56.5Q207-160 240-160t56.5-23.5Z" />
+              </svg>
+            </span>
+            <span class="label">ATENDIMENTOS</span>
+          </div>
+          <div class="card-value">{{ cortes_hoje }}</div>
+          <div class="card-footer-label">hoje</div>
+        </div>
+
+        <div class="card-mini">
+          <div class="card-header-mini">
+            <span class="icon">
+              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                <path d="M441-120v-86q-53-12-91.5-46T293-348l74-30q15 48 44.5 73t77.5 25q41 0 69.5-18.5T587-356q0-35-22-55.5T463-458q-86-27-118-64.5T313-614q0-65 42-101t86-41v-84h80v84q50 8 82.5 36.5T651-650l-74 32q-12-32-34-48t-60-16q-44 0-67 19.5T393-614q0 33 30 52t104 40q69 20 104.5 63.5T667-358q0 71-42 108t-104 46v84h-80Z" />
+              </svg>
+            </span>
+            <span class="label">FATURAMENTO</span>
+          </div>
+          <div class="card-value">R$ {{ faturamento_hoje }}</div>
+          <div class="card-footer-label">hoje</div>
+        </div>
+      </div>
+
+      <h3 class="section-title">ESTE MÊS</h3>
+      <div class="monthly-card">
+        <div class="monthly-item">
+          <div class="monthly-info">
+            <div class="icon-bg">
+              <i class="fas fa-calendar-alt"></i>
+              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                <path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-188.5-11.5Q280-423 280-440t11.5-28.5Q303-480 320-480t28.5 11.5Q360-457 360-440t-11.5 28.5Q337-400 320-400t-28.5-11.5ZM640-400q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-188.5-11.5Q280-263 280-280t11.5-28.5Q303-320 320-320t28.5 11.5Q360-297 360-280t-11.5 28.5Q337-240 320-240t-28.5-11.5ZM640-240q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z" />
+              </svg>
+            </div>
+            <div>
+              <span class="monthly-label">Atendimentos no mês</span>
+              <div class="monthly-value">{{ cortes_mes }}</div>
+            </div>
+          </div>
+          <i class="fas fa-chevron-right arrow"></i>
+        </div>
+        <hr class="divider" />
+        <div class="monthly-item">
+          <div class="monthly-info">
+            <div class="icon-bg">
+              <i class="fas fa-wallet"></i> <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                <path d="M200-200v-560 560Zm0 80q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v100h-80v-100H200v560h560v-100h80v100q0 33-23.5 56.5T760-120H200Zm320-160q-33 0-56.5-23.5T440-360v-240q0-33 23.5-56.5T520-680h280q33 0 56.5 23.5T880-600v240q0 33-23.5 56.5T800-280H520Zm280-80v-240H520v240h280Zm-117.5-77.5Q700-455 700-480t-17.5-42.5Q665-540 640-540t-42.5 17.5Q580-505 580-480t17.5 42.5Q615-420 640-420t42.5-17.5Z" />
+              </svg>
+            </div>
+            <div>
+              <span class="monthly-label">Faturamento do mês</span>
+              <div class="monthly-value">R$ {{ faturamento_mes }}</div>
+            </div>
+          </div>
+          <i class="fas fa-chevron-right arrow"></i>
+        </div>
+      </div>
+
+      <div class="section-header-inline">
+        <h3 class="section-title">AGENDA DE HOJE</h3>
+        <span class="live-badge">Aberto</span>
+      </div>
+
+      <div class="agenda-container">
+        {% if agendamentos_hoje %}
+          {% for a in agendamentos_hoje %}
+            <div class="appointment-item">
+              <span>{{ a.horario }} - {{ a.cliente.first_name }}</span>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-state">
+            <div class="emoji">🥳</div>
+            <p>Nenhum atendimento para hoje.</p>
+            <span>Total de atendimentos hoje: 0</span>
+          </div>
+        {% endif %}
+      </div>
+
+      <a href="{% url 'minha_agenda_barbeiro' %}" class="btn-primary btn-txt">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+          <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z" />
+        </svg>Agendamentos
+      </a>
+    </section>
+  </div>
+{% endblock %}

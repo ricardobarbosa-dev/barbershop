@@ -1,0 +1,180 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}
+  Dashboard Cliente | Histórico
+{% endblock %}
+
+{% block breadcrumb %}
+  Dashboard / <strong>Histórico</strong>
+{% endblock %}
+
+{% block content %}
+  <div class="appointments">
+    <h3>Meus Agendamentos</h3>
+  </div>
+
+  <!-- MOBILE -->
+  <div class="card-mobile">
+    {% if page_obj %}
+      {% for a in page_obj %}
+        <section id="card" class="{% if a.status != 'PENDENTE' %}disabled{% endif %}">
+          <div class="card-header">
+            <div class="info-service">
+              <h3 style="{% if a.status != 'PENDENTE' %}text-decoration: line-through; opacity:.6;{% endif %}">{{ a.servico.nome }}</h3>
+              <p style="{% if a.status != 'PENDENTE' %}text-decoration: line-through; opacity:.6;{% endif %}">{{ a.servico.descricao|default:'Serviço profissional' }} • {{ a.servico.duracao|default:'60' }} min</p>
+            </div>
+
+            <strong class="status-{{ a.status|lower }} status">
+              {% if a.status == 'PENDENTE' %}
+                AGENDADO
+              {% elif a.status == 'CONCLUIDO' %}
+                CONCLUÍDO
+              {% else %}
+                CANCELADO
+              {% endif %}
+            </strong>
+          </div>
+
+          <div class="card-details">
+            <div class="barber-info">
+              {% if a.barbeiro.foto %}
+                <img src="{{ a.barbeiro.foto.url }}" class="avatar" />
+              {% elif a.barbeiro.user.profile.foto %}
+                <img src="{{ a.barbeiro.user.profile.foto.url }}" class="avatar" />
+              {% else %}
+                <div class="avatar-placeholder"></div>
+              {% endif %}
+
+              <div>
+                <span>BARBEIRO</span>
+                <h4>{{ a.barbeiro.nome }}</h4>
+              </div>
+            </div>
+
+            <div class="date-info">
+              <div>
+                <span>DATA/HORA</span>
+                <h4>{{ a.data|date:'d M' }} • {{ a.horario }}</h4>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-actions">
+            {% if a.status == 'PENDENTE' %}
+              <form method="POST" action="{% url 'cancelar_agendamento' a.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-cancel" onclick="return confirm('Tem certeza que deseja cancelar este agendamento?')">CANCELAR</button>
+              </form>
+            {% else %}
+              —
+            {% endif %}
+          </div>
+        </section>
+      {% endfor %}
+    {% else %}
+      <p style="text-align:center; padding:20px;">Você não possui agendamentos.</p>
+    {% endif %}
+  </div>
+
+  <!-- DESKTOP -->
+  <div class="table-container">
+    <div class="table-header">
+      <h2>Histórico de Cortes</h2>
+      <button class="btn-export">EXPORTAR PDF</button>
+    </div>
+
+    <table class="appointments-table">
+      <thead>
+        <tr>
+          <th>SERVIÇO</th>
+          <th>PROFISSIONAL</th>
+          <th>DATA & HORÁRIO</th>
+          <th>STATUS</th>
+          <th>AÇÕES</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% if page_obj %}
+          {% for a in page_obj %}
+            <tr class="{% if a.status != 'PENDENTE' %}disabled{% endif %}">
+              <td>
+                <strong style="{% if a.status != 'PENDENTE' %}text-decoration: line-through; opacity:.6;{% endif %}">{{ a.servico.nome }}</strong>
+                <span>{{ a.servico.descricao|default:'Serviço profissional' }} • {{ a.servico.duracao }} min</span>
+              </td>
+
+              <td class="barber">
+                {% if a.barbeiro.foto %}
+                  <img src="{{ a.barbeiro.foto.url }}" class="avatar" />
+                {% elif a.barbeiro.user.profile.foto %}
+                  <img src="{{ a.barbeiro.user.profile.foto.url }}" class="avatar" />
+                {% else %}
+                  <div class="avatar-placeholder"></div>
+                {% endif %}
+                {{ a.barbeiro.user.first_name }} {{ a.barbeiro.user.last_name }}
+              </td>
+
+              <td>
+                <strong>{{ a.data|date:'d \\d\\e M, Y' }}</strong>
+                <span class="hour">{{ a.horario }}</span>
+              </td>
+
+              <td>
+                <span class="status status-{{ a.status|lower }}">
+                  {% if a.status == 'PENDENTE' %}
+                    AGENDADO
+                  {% elif a.status == 'CONCLUIDO' %}
+                    CONCLUÍDO
+                  {% else %}
+                    CANCELADO
+                  {% endif %}
+                </span>
+              </td>
+
+              <td>
+                {% if a.status == 'PENDENTE' %}
+                  <form method="POST" action="{% url 'cancelar_agendamento' a.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-cancel" onclick="return confirm('Tem certeza?')">CANCELAR</button>
+                  </form>
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="5" style="text-align:center; padding:30px;">Você ainda não possui histórico.</td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+
+    <div class="table-footer">
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+          <path d="m40-120 440-760 440 760H40Zm138-80h604L480-720 178-200Zm330.5-51.5Q520-263 520-280t-11.5-28.5Q497-320 480-320t-28.5 11.5Q440-297 440-280t11.5 28.5Q463-240 480-240t28.5-11.5ZM440-360h80v-200h-80v200Zm40-100Z" />
+        </svg>Os cancelamentos devem ser realizados com pelo menos 2 horas de antecedência.
+      </p>
+
+      <div class="pagination">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}">‹</a>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+            <span class="current">{{ num }}</span>
+          {% else %}
+            <a href="?page={{ num }}">{{ num }}</a>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}">›</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

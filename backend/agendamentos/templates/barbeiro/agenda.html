@@ -1,0 +1,94 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}
+  Meus Pacotes
+{% endblock %}
+
+{% block breadcrumb %}
+  Dashboard / <strong>Agenda</strong>
+{% endblock %}
+
+{% block content %}
+  <link rel="stylesheet" href="{% static 'agendamentos/css/agenda.css' %}" />
+
+  <div class="container-card">
+    <header class="header-text">
+      <h1>ABRIR <span>AGENDA</span></h1>
+      <p>Abrir minha agenda da semana.</p>
+    </header>
+
+    <section id="card" class="principal">
+      <form method="POST">
+        {% csrf_token %}
+        <div class="input-group">
+          <label>DIA DA SEMANA</label>
+          <select name="dia_semana" class="form-select" required>
+            <option value="0">Segunda-feira</option>
+            <option value="1">Terça-feira</option>
+            <option value="2">Quarta-feira</option>
+            <option value="3">Quinta-feira</option>
+            <option value="4">Sexta-feira</option>
+            <option value="5">Sábado</option>
+            <option value="6">Domingo</option>
+          </select>
+        </div>
+
+        <div class="row-inputs">
+          <div class="input-group">
+            <label>INÍCIO</label>
+            <input type="time" name="hora_inicio" class="form-control" required />
+          </div>
+          <div class="input-group">
+            <label>FIM</label>
+            <input type="time" name="hora_fim" class="form-control" required />
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>DURAÇÃO DO ATENDIMENTO (MINUTOS)</label>
+          <div class="input-wrapper">
+            <input type="number" name="intervalo" class="form-control" value="30" required style="width: 100%;" />
+            <span class="unit-label">min</span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" style="justify-content: center; align-items: center; width: 100%;">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+            <path d="M840-680v480q0 33-23.5 56.5T760-120H200q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h480l160 160Zm-80 34L646-760H200v560h560v-446ZM565-275q35-35 35-85t-35-85q-35-35-85-35t-85 35q-35 35-35 85t35 85q35 35 85 35t85-35ZM240-560h360v-160H240v160Zm-40-86v446-560 114Z" />
+          </svg>SALVAR
+        </button>
+      </form>
+    </section>
+
+    <section id="card" class="principal">
+      <div class="list-header">
+        <h2>HORÁRIOS CONFIGURADOS</h2>
+        <span class="badge-count">{{ configuracoes|length }} DIAS</span>
+      </div>
+
+      {% for conf in configuracoes %}
+        <div class="horario-card">
+          <div class="icon-box">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+              <path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-188.5-11.5Q280-423 280-440t11.5-28.5Q303-480 320-480t28.5 11.5Q360-457 360-440t-11.5 28.5Q337-400 320-400t-28.5-11.5ZM640-400q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-188.5-11.5Q280-263 280-280t11.5-28.5Q303-320 320-320t28.5 11.5Q360-297 360-280t-11.5 28.5Q337-240 320-240t-28.5-11.5ZM640-240q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z" />
+            </svg>
+          </div>
+          <div class="info-box">
+            <span class="dia-texto">{{ conf.get_dia_semana_display }}</span>
+            <span class="detalhes-texto">{{ conf.hora_inicio|time:'H:i' }} — {{ conf.hora_fim|time:'H:i' }} • {{ conf.intervalo }} min</span>
+          </div>
+          <div class="actions-box">
+            <a href="{% url 'excluir_disponibilidade' conf.id %}" class="btn-icon delete">
+              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      {% empty %}
+        <p class="text-center text-muted">Nenhum horário configurado.</p>
+      {% endfor %}
+    </section>
+  </div>
+{% endblock %}

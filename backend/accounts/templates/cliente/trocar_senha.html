@@ -1,0 +1,22 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+  <div class="container-card">
+    <section id="card" class="principal">
+      <form method="POST" class="form-premium">
+        {% csrf_token %}
+
+        {% for field in form %}
+          <div class="group-layout">
+            <label class="section-label">{{ field.label }}</label>
+            <div class="input-with-icon full-width">{{ field }}</div>
+          </div>
+        {% endfor %}
+
+        <div class="form-actions-premium">
+          <button type="submit" class="btn-save-premium">ATUALIZAR SENHA</button>
+        </div>
+      </form>
+    </section>
+  </div>
+{% endblock %}

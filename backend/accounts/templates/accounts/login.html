@@ -1,0 +1,68 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+{% load socialaccount %}
+
+{% block content %}
+  <link rel="stylesheet" href="{% static 'accounts/css/login.css' %}" />
+  <link rel="stylesheet" href="{% static 'agendamentos/css/dashboard.css' %}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+  <div class="login-container">
+    <div class="login-header">
+      <div class="logo-circle">
+        <i class="fas fa-scissors"></i>
+      </div>
+      <h1>BARBER<span>SHOP</span></h1>
+      <p class="subtitle">PREMIUM EXPERIENCE</p>
+    </div>
+
+    <form method="POST" class="login-form">
+      {% csrf_token %}
+
+      <div class="input-group">
+        <label>LOGIN</label>
+        <div class="input-wrapper">
+          <i class="far fa-user"></i>
+          <input type="text" name="username" placeholder="Usuário ou E-mail" autocomplete="username" required />
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>SENHA</label>
+        <div class="input-wrapper">
+          <i class="fas fa-lock"></i>
+          <input type="password" name="password" id="senha" placeholder="************" autocomplete="current-password" required />
+          <i class="far fa-eye eye-icon" id="togglePassword" style="cursor: pointer;"></i>
+        </div>
+        <a href="{% url 'reset_password' %}" class="forgot-password">Esqueceu a senha?</a>
+      </div>
+
+      <button type="submit" class="btn-primary" style="display: flex; justify-content: center; align-items: center; font-weight: bold; padding: 1.2rem;">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+          <path d="M480-120v-80h280v-560H480v-80h280q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H480Zm-80-160-55-58 102-102H120v-80h327L345-622l55-58 200 200-200 200Z" />
+        </svg>
+        <span style="margin-left: 10px;">Entrar</span>
+      </button>
+
+      <a href="{% provider_login_url 'google' %}" class="social-btn-login">
+        <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" />
+        Entrar com Google
+      </a>
+
+      <p class="footer-text">
+        Ainda não tem uma conta? <a href="{% url 'register' %}">Criar conta</a>
+      </p>
+    </form>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script>
+    const messages = [
+        {% for message in messages %}
+            { text: "{{ message|escapejs }}", type: "{{ message.tags }}" },
+        {% endfor %}
+    ];
+</script>
+  <script src="{% static 'js/script.js' %}"></script>
+{% endblock %}

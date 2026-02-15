@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://kit.fontawesome.com/your-code.js" crossorigin="anonymous"></script>
+    <title>Dashboard Cliente</title>
+    <link rel="stylesheet" href="{% static 'agendamentos/css/dashboard.css' %}" />
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <!-- Header usuário -->
+      <header class="dashboard-header">
+        <div class="user-info">
+          {% if user.profile.foto %}
+            <img src="{{ user.profile.foto.url }}" alt="Foto do usuário" class="user-photo" />
+          {% else %}
+            <div class="user-photo placeholder">👤</div>
+          {% endif %}
+          <div class="user-details">
+            <h2>Olá, {{ user.username }} {{ user.last_name }}</h2>
+
+            <p>
+              Cortes realizados: <span class="highlight">{{ cortes_realizados }}</span>
+            </p>
+          </div>
+        </div>
+      </header>
+
+      <!-- Cards de ação -->
+      <div class="dashboard-cards">
+        <a href="{% url 'criar_agendamento' %}" class="card">📅 Novo Agendamento</a>
+        {% comment %} <a href="{% url 'listar_agendamentos' %}" class="card">🗓 Meus Agendamentos</a> {% endcomment %}
+      </div>
+
+      <!-- Lista de Agendamentos -->
+      <div class="agendamento-table">
+        <h3>Meus Agendamentos</h3>
+        {% if agendamentos %}
+          <table>
+            <thead>
+              <tr>
+                <th>Serviço</th>
+                <th>Barbeiro</th>
+                <th>Data</th>
+                <th>Horário</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for a in agendamentos %}
+                <tr>
+                  <td data-label="Serviço">{{ a.servico.nome }}</td>
+                  <td data-label="Barbeiro">{{ a.barbeiro.nome }}</td>
+                  <td data-label="Data">{{ a.data }}</td>
+                  <td data-label="Horário">{{ a.horario }}</td>
+                  <td data-label="Status">
+                    <span class="status {% if a.status == 'CANCELADO' %}
+                        
+                         status-cancelado
+
+                      {% elif a.status == 'CONCLUIDO' %}
+                        
+                         status-confirmado
+
+                      {% elif a.status == 'PENDENTE' %}
+                        
+                        status-pendente
+
+                      {% endif %} ">
+                      {% if a.status == 'CONCLUIDO' %}
+                        CONCLUÍDO
+                      {% elif a.status == 'PENDENTE' %}
+                        PENDENTE
+                      {% elif a.status == 'CANCELADO' %}
+                        CANCELADO
+                      {% endif %}
+                    </span>
+                  </td>
+                  <td data-label="Ações">
+                    {% if a.status == 'PENDENTE' %}
+                      <a href="{% url 'cancelar_agendamento' a.id %}" class="cancel-btn">Cancelar</a>
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p class="no-agendamentos">Você não possui agendamentos.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div id="toast-container"></div>
+    <script src="{% static 'agendamentos/js/toast.js' %}"></script>
+  </body>
+</html>

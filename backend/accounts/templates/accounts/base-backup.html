@@ -1,0 +1,147 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" type="image/png" href="{% static '/images/favicon.ico' %}" />
+
+    <title>
+      {% block title %}
+        Dashboard | Barbearia
+      {% endblock %}
+    </title>
+
+    <link rel="stylesheet" href="{% static 'agendamentos/css/dashboard.css' %}" />
+    <link rel="stylesheet" href="{% static 'accounts/css/perfil.css' %}" />
+
+    <style>
+      #toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    {% if user.is_authenticated %}
+      <aside class="sidebar">
+        <div class="logo">
+          <span class="icon-yellow">✂</span>
+          <span class="logo-text">BARBER<span class="logo-yellow">SHOP</span></span>
+        </div>
+
+        <nav class="menu-nav">
+          <a href="{% url 'dashboard_cliente' %}" class="menu-item {% if request.resolver_match.url_name == 'dashboard_cliente' %}active{% endif %}">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
+              <path d="M520-600v-240h320v240H520ZM120-440v-400h320v400H120Zm400 320v-400h320v400H520Zm-400 0v-240h320v240H120Zm80-400h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Z" />
+            </svg><span>Início</span>
+          </a>
+
+          <a href="{% url 'perfil_cliente' %}" class="menu-item {% if request.resolver_match.url_name == 'perfil_cliente' %}active{% endif %}">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
+              <path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Z" />
+            </svg><span>Dados</span>
+          </a>
+
+          <a href="{% url 'meus_pacotes' %}" class="menu-item {% if request.resolver_match.url_name == 'meus_pacotes' %}active{% endif %}">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+              <path d="M600-800H360v280h240v-280Zm200 0H680v280h120v-280ZM575-440H320v240h222q21 0 40.5-7t35.5-21l166-137q-8-8-18-12t-21-6q-17-3-33 1t-30 15l-108 87H400v-80h146l44-36q5-3 7.5-8t2.5-11q0-10-7.5-17.5T575-440Zm-335 0h-80v280h80v-280Zm40 0v-360q0-33 23.5-56.5T360-880h440q33 0 56.5 23.5T880-800v280q0 33-23.5 56.5T800-440H280ZM240-80h-80q-33 0-56.5-23.5T80-160v-280q0-33 23.5-56.5T160-520h415q85 0 164 29t127 98l27 41-223 186q-27 23-60 34.5T542-120H309q-11 18-29 29t-40 11Z" />
+            </svg><span>Pacotes</span>
+          </a>
+
+          <a href="{% url 'historico_cliente' %}" class="menu-item {% if request.resolver_match.url_name == 'historico_cliente' %}active{% endif %}">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+              <path d="M480-120q-138 0-240.5-91.5T122-440h82q14 104 92.5 172T480-200q117 0 198.5-81.5T760-480q0-117-81.5-198.5T480-760q-69 0-129 32t-101 88h110v80H120v-240h80v94q51-64 124.5-99T480-840q75 0 140.5 28.5t114 77q48.5 48.5 77 114T840-480q0 75-28.5 140.5t-77 114q-48.5 48.5-114 77T480-120Zm112-192L440-464v-216h80v184l128 128-56 56Z" />
+            </svg><span>Histórico</span>
+          </a>
+
+          <a href="{% url 'criar_agendamento' %}" class="menu-item {% if request.resolver_match.url_name == 'criar_agendamento' %}active{% endif %}">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+              <path d="M340-720q-33 0-56.5-23.5T260-800q0-33 23.5-56.5T340-880q33 0 56.5 23.5T420-800q0 33-23.5 56.5T340-720Zm220 560H302q-33 0-60.5-23.5T207-240l-87-440h82l88 440h270v80Zm220 80L664-280H386q-29 0-50.5-17.5T308-344l-44-214q-11-48 22.5-85t81.5-37q35 0 63.5 21t36.5 57l44 202h130q21 0 39 11t29 29l140 240-70 40Z" />
+            </svg><span>Reserva</span>
+          </a>
+        </nav>
+
+        <a href="/accounts/logout/" class="logout"><span>Sair</span></a>
+      </aside>
+    {% endif %}
+
+    <main class="main-content {% if user.is_authenticated %}authenticated{% endif %}">
+      {% if user.is_authenticated %}
+        <header class="top-menu">
+          <div class="breadcrumb">
+            {% block breadcrumb %}
+              Dashboard
+            {% endblock %}
+          </div>
+
+          <div class="logo-mobile">
+            <span class="icon-yellow">✂</span>
+            <span class="logo-text">BARBER<span class="logo-yellow">SHOP</span></span>
+          </div>
+
+          <div class="user-profile">
+            <div class="notifications">
+              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                <path d="M160-200v-80h80v-280q0-83 50-147.5T420-792v-28q0-25 17.5-42.5T480-880q25 0 42.5 17.5T540-820v28q80 20 130 84.5T720-560v280h80v80H160Zm320-300Zm0 420q-33 0-56.5-23.5T400-160h160q0 33-23.5 56.5T480-80ZM320-280h320v-280q0-66-47-113t-113-47q-66 0-113 47t-47 113v280Z" />
+              </svg>
+              <span id="badge"></span>
+              <div id="dropdown-notificacoes"></div>
+            </div>
+
+            <span class="separator"></span>
+
+            <div class="user-info">
+              <span class="user-name">{{ user.first_name }} {{ user.last_name }}</span>
+
+              <span class="user-type">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                  <path d="m354-287 126-76 126 77-33-144 111-96-146-13-58-136-58 135-146 13 111 97-33 143ZM233-120l65-281L80-590l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm247-350Z" />
+                </svg>{{ cargo_cliente }}
+              </span>
+            </div>
+
+            {% if user.profile.foto %}
+              <img src="{{ user.profile.foto.url }}" alt="Foto" class="avatar" />
+            {% else %}
+              <div class="avatar-placeholder"></div>
+            {% endif %}
+          </div>
+        </header>
+      {% endif %}
+
+      {% block content %}
+
+      {% endblock %}
+
+      <footer>
+        <span>&copy 2026 - Barbershop Premium</span>
+      </footer>
+    </main>
+
+    {% if messages %}
+      <div id="django-messages" style="display:none;">
+        {% for message in messages %}
+          <div data-type="{{ message.tags|default:'info' }}" data-text="{{ message|escapejs }}"></div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div id="toast-container"></div>
+
+    <script src="{% static 'js/toast.js' %}"></script>
+    <script src="{% static 'agendamentos/js/notificacoes.js' %}"></script>
+
+    {% block scripts %}
+
+    {% endblock %}
+  </body>
+</html>
+
+{% comment %}backup base.html 01:07 - 11/02/2026{% endcomment %}

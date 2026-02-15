@@ -1,0 +1,71 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block content %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link rel="stylesheet" href="{% static 'agendamentos/css/agenda.css' %}" />
+
+  <div class="container-card">
+    <header class="header-text">
+      <h1>EDITAR <span>PERFIL</span></h1>
+      <p>Personalize sua localização e redes sociais.</p>
+    </header>
+
+    <section id="card" class="principal">
+      <form method="POST" class="form-premium">
+        {% csrf_token %}
+
+        <div class="group-layout">
+          <label class="section-label">SUA LOCALIZAÇÃO</label>
+          <div class="input-with-icon full-width">
+            <i class="fas fa-map-marker-alt"></i>
+            <input type="text" name="localizacao" placeholder="Morumbi, Sao Paulo" value="{{ form.localizacao.value|default:'' }}" required />
+          </div>
+        </div>
+
+        <h4 class="section-subtitle">REDES SOCIAIS</h4>
+
+        <div class="row-inputs">
+          <div class="group-layout">
+            <label class="social-label">WhatsApp</label>
+            <div class="input-with-icon">
+              <i class="fab fa-whatsapp"></i>
+              <input type="text" name="whatsapp" placeholder="11961961798" value="{{ form.whatsapp.value|default:'' }}" />
+            </div>
+          </div>
+
+          <div class="group-layout">
+            <label class="social-label">Instagram</label>
+            <div class="input-with-icon">
+              <i class="fab fa-instagram"></i>
+              <input type="text" name="instagram" placeholder="ricardobarbosa_dev" value="{{ form.instagram.value|default:'' }}" />
+            </div>
+          </div>
+        </div>
+
+        <div class="row-inputs">
+          <div class="group-layout">
+            <label class="social-label">Facebook</label>
+            <div class="input-with-icon">
+              <i class="fab fa-facebook-f"></i>
+              <input type="text" name="facebook" placeholder="ricardobarbosa_dev" value="{{ form.facebook.value|default:'' }}" />
+            </div>
+          </div>
+
+          <div class="group-layout">
+            <label class="social-label">Site</label>
+            <div class="input-with-icon">
+              <i class="fas fa-globe"></i>
+              <input type="url" name="site_pessoal" placeholder="https://barbershop.com.br/" value="{{ form.site_pessoal.value|default:'' }}" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions-premium">
+          <button type="submit" class="btn-save-premium">SALVAR</button>
+          <a href="{% url 'dashboard_barbeiro' %}" class="btn-cancel-premium">CANCELAR</a>
+        </div>
+      </form>
+    </section>
+  </div>
+{% endblock %}

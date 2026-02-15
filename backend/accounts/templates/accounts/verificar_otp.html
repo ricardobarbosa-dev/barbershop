@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verificar código</title>
+    <link rel="stylesheet" href="{% static 'accounts/css/login.css' %}" />
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="login-card">
+        <h1>Código 🔐</h1>
+        <p>Digite o código de 6 dígitos</p>
+
+        <form method="POST">
+          {% csrf_token %}
+          <input type="text" name="codigo" placeholder="000000" maxlength="6" inputmode="numeric" required />
+
+          <button type="submit">
+            Confirmar
+            <span class="loader"></span>
+          </button>
+        </form>
+
+        <p class="hint">O código expira em 5 minutos</p>
+      </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <script>
+const messages = [
+{% for message in messages %}
+{ text: "{{ message }}", type: "{{ message.tags }}" },
+{% endfor %}
+];
+</script>
+    <script src="{% static 'js/toast.js' %}"></script>
+  </body>
+</html>

@@ -1,0 +1,139 @@
+/* Base */
+body {
+    font-family: 'Inter', sans-serif;
+    background-image: radial-gradient(circle at 17% 36%, rgba(35, 35, 35, 0.06) 0%, rgba(35, 35, 35, 0.06) 25%, rgba(42, 42, 42, 0.06) 25%, rgba(42, 42, 42, 0.06) 50%, rgba(48, 48, 48, 0.06) 50%, rgba(48, 48, 48, 0.06) 75%, rgba(55, 55, 55, 0.06) 75%, rgba(55, 55, 55, 0.06) 100%), radial-gradient(circle at 4% 82%, rgba(0, 0, 0, 0.06) 0%, rgba(0, 0, 0, 0.06) 25%, rgba(39, 39, 39, 0.06) 25%, rgba(39, 39, 39, 0.06) 50%, rgba(78, 78, 78, 0.06) 50%, rgba(78, 78, 78, 0.06) 75%, rgba(117, 117, 117, 0.06) 75%, rgba(117, 117, 117, 0.06) 100%), radial-gradient(circle at 45% 66%, rgba(64, 64, 64, 0.06) 0%, rgba(64, 64, 64, 0.06) 25%, rgba(91, 91, 91, 0.06) 25%, rgba(91, 91, 91, 0.06) 50%, rgba(117, 117, 117, 0.06) 50%, rgba(117, 117, 117, 0.06) 75%, rgba(144, 144, 144, 0.06) 75%, rgba(144, 144, 144, 0.06) 100%), linear-gradient(129deg, rgb(29, 29, 29), rgb(24, 24, 24));
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+    color: #222;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.card {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 450px;
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+h1 {
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    color: #222;
+}
+
+label {
+    display: block;
+    margin-top: 1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 0.9rem;
+    margin-top: 0.3rem;
+    border-radius: 0.7rem;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    transition: border 0.3s, box-shadow 0.3s;
+}
+
+input:focus,
+select:focus {
+    border-color: #FFCC00;
+    box-shadow: 0 0 8px rgba(255, 204, 0, 0.4);
+    outline: none;
+}
+
+.btn-criar {
+    display: flex;
+    gap: 15rem;
+}
+
+.btn-back {
+    background: none;
+    border: 1px solid #ccc;
+}
+
+button {
+    margin-top: 1.5rem;
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 0.7rem;
+    background: #ecbe04;
+    color: #000;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+}
+
+button:hover {
+    background: #ffcc00;
+}
+
+button .loader {
+    display: none;
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 3px solid #fff;
+    border-radius: 50%;
+    border-top: 3px solid #FFCC00;
+    width: 18px;
+    height: 18px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: translateY(-50%) rotate(0deg);
+    }
+
+    100% {
+        transform: translateY(-50%) rotate(360deg);
+    }
+}
+
+/* Toast container */
+#toast-container {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1000;
+}
+
+/* Mobile first adjustments */
+@media (max-width: 480px) {
+    .card {
+        padding: 1.5rem;
+        width: 95%;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+}

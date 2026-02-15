@@ -1,0 +1,99 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}
+  Dashboard Cliente | Meus Dados
+{% endblock %}
+
+{% block breadcrumb %}
+  Dashboard / <strong>Dados</strong>
+{% endblock %}
+
+{% block content %}
+  <link rel="stylesheet" href="{% static 'accounts/css/perfil.css' %}" />
+
+  <div class="container-card">
+    <section id="card" class="principal">
+      <div class="profile-container">
+        <form id="perfilForm" method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <div class="avatar-area">
+            <div class="avatar-wrapper">
+              {% if profile.foto %}
+                <img src="{{ profile.foto.url }}" class="avatar-img" id="avatar-preview" alt="Foto de perfil" />
+              {% else %}
+                <img src="{% static 'accounts/img/user.png' %}" class="avatar-img" id="avatar-preview" alt="Avatar padrão" />
+              {% endif %}
+
+              <label for="foto-input" class="avatar-hover-label">
+                <div class="hover-content">
+                  <svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="#FFD700">
+                    <path d="M440-440ZM120-120q-33 0-56.5-23.5T40-200v-480q0-33 23.5-56.5T120-760h126l74-80h240v80H355l-73 80H120v480h640v-360h80v360q0 33-23.5 56.5T760-120H120Zm640-560v-80h-80v-80h80v-80h80v80h80v80h-80v80h-80ZM440-260q75 0 127.5-52.5T620-440q0-75-52.5-127.5T440-620q-75 0-127.5 52.5T260-440q0 75 52.5 127.5T440-260Zm0-80q-42 0-71-29t-29-71q0-42 29-71t71-29q42 0 71 29t29 71q0 42-29 71t-71 29Z" />
+                  </svg>
+                  <span>Alterar Foto</span>
+                </div>
+              </label>
+
+              <input type="file" name="foto" id="foto-input" class="file-input" accept="image/*" style="display: none;" />
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Nome</label>
+              <input type="text" name="first_name" value="{{ u_form.first_name.value|default:user.first_name }}" placeholder="Digite seu nome" autocomplete="given-name" />
+            </div>
+
+            <div class="form-group">
+              <label>Sobrenome</label>
+              <input type="text" name="last_name" value="{{ u_form.last_name.value|default:user.last_name }}" placeholder="Digite seu sobrenome" autocomplete="family-name" />
+            </div>
+
+            <div class="form-group">
+              <label>Telefone</label>
+              <input type="text" name="telefone" id="id_telefone" value="{{ p_form.telefone.value|default:profile.telefone|default:'' }}" placeholder="(11) 99999-9999" autocomplete="tel" />
+            </div>
+
+            <div class="form-group">
+              <label>E-mail (Não alterável)</label>
+              <input type="email" name="email" value="{{ user.email }}" readonly tabindex="-1" style="color: #666; cursor: not-allowed;" autocomplete="email" />
+            </div>
+          </div>
+          <button type="submit" class="btn-primary" style="margin-top: 20px;">Salvar alterações</button>
+        </form>
+
+        <div class="divider"></div>
+
+        <div class="password-title" style="color: #FFD700; font-weight: bold; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px;">
+          <i class="fas fa-shield-alt"></i> Segurança
+        </div>
+
+        <form id="senhaForm" method="POST" action="">
+          {% csrf_token %}
+          <input type="text" name="username" value="{{ user.username }}" style="display:none;" autocomplete="username" />
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Senha atual</label>
+              <input type="password" name="old_password" required placeholder="*************" autocomplete="current-password" />
+            </div>
+
+            <div class="form-group">
+              <label>Nova senha</label>
+              <input type="password" name="new_password1" id="new_password1" required placeholder="*************" autocomplete="new-password" />
+            </div>
+
+            <input type="hidden" name="new_password2" id="id_new_password2" />
+          </div>
+
+          <button type="submit" onclick="copiarSenha()" class="btn-primary">Atualizar senha</button>
+        </form>
+      </div>
+    </section>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'accounts/js/perfil.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,199 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}
+  Gerenciar Pacotes
+{% endblock %}
+
+{% block breadcrumb %}
+  Dashboard / <strong>Pacotes</strong>
+{% endblock %}
+
+{% block content %}
+  <link rel="stylesheet" href="{% static 'agendamentos/css/agenda.css' %}" />
+
+  <div class="container-card">
+    <header class="header-text">
+      <h1>GERENCIAR <span>PACOTES</span></h1>
+      <p>Gerencie os pacotes dos seus clientes.</p>
+      <button class="btn-primary" id="openModalPacote" style="margin-top: 15px; cursor: pointer;"><i class="fas fa-plus"></i> NOVO PACOTE</button>
+    </header>
+
+    <div class="card-mobile">
+      {% if pacotes %}
+        {% for p in pacotes %}
+          <section id="card" class="{% if not p.ativo or p.expirado %}disabled{% endif %}">
+            <div class="card-header">
+              <div class="info-service">
+                <h3 style="{% if not p.ativo or p.expirado %} text-decoration: line-through; opacity: .6;{% endif %}">PACOTE 4 CORTES</h3>
+                <p>Iniciado em {{ p.data_inicio|date:'d/m' }}</p>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="info-status">
+                  <strong class="status {% if p.ativo and not p.expirado %}
+                      
+                      status-concluido
+
+                    {% else %}
+                      
+                      status-cancelado
+
+                    {% endif %}">
+                    {% if p.ativo and not p.expirado %}
+                      ATIVO
+                    {% else %}
+                      FINALIZADO
+                    {% endif %}
+                  </strong>
+                </div>
+                <a href="{% url 'remover_pacote' p.id %}" onclick="return confirm('Tem certeza que deseja remover este pacote?')" style="display: flex;">
+                  <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="#e74c3c">
+                    <path d="m336-280 144-144 144 144 56-56-144-144 144-144-56-56-144 144-144-144-56 56 144 144-144 144 56 56ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+
+            <div class="card-details">
+              <div class="barber-info">
+                {% if p.cliente.profile.foto %}
+                  <img src="{{ p.cliente.profile.foto.url }}" class="avatar" />
+                {% else %}
+                  <div class="avatar-placeholder">{{ p.cliente.username|first|upper }}</div>
+                {% endif %}
+                <div>
+                  <span>CLIENTE</span>
+                  <h4>{{ p.cliente.get_full_name|default:p.cliente.username }}</h4>
+                </div>
+              </div>
+              <div class="date-info">
+                <div>
+                  <span>USO DO SALDO</span>
+                  <h4>{{ p.cortes_usados }} / {{ p.total_cortes }}</h4>
+                </div>
+              </div>
+            </div>
+          </section>
+        {% endfor %}
+      {% else %}
+        <p style="text-align: center; color: #888; padding: 20px;">Nenhum pacote encontrado.</p>
+      {% endif %}
+    </div>
+
+    <div class="table-container">
+      <table class="appointments-table">
+        <thead>
+          <tr>
+            <th>CLIENTE</th>
+            <th>USADO / TOTAL</th>
+            <th>VALIDADE</th>
+            <th>STATUS</th>
+            <th>AÇÕES</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in pacotes %}
+            <tr class="{% if not p.ativo or p.expirado %}disabled{% endif %}">
+              <td class="barber">
+                {% if p.cliente.profile.foto %}
+                  <img src="{{ p.cliente.profile.foto.url }}" class="avatar" />
+                {% else %}
+                  <div class="avatar-placeholder">{{ p.cliente.username|first|upper }}</div>
+                {% endif %}
+                <h4>{{ p.cliente.get_full_name|default:p.cliente.username }}</h4>
+              </td>
+              <td>
+                <strong style="color: #f1c40f;">{{ p.cortes_usados }} de {{ p.total_cortes }}</strong>
+              </td>
+              <td>
+                <strong>{{ p.data_fim|date:'d/m/Y' }}</strong>
+              </td>
+              <td>
+                <span class="status {% if p.ativo and not p.expirado %}
+                    
+                    status-concluido
+
+                  {% else %}
+                    
+                    status-cancelado
+
+                  {% endif %}">
+                  {% if p.ativo and not p.expirado %}
+                    ATIVO
+                  {% else %}
+                    FINALIZADO
+                  {% endif %}
+                </span>
+              </td>
+              <td>
+                <a href="{% url 'remover_pacote' p.id %}" onclick="return confirm('Tem certeza que deseja remover este pacote? Esta ação não pode ser desfeita.')" class="btn-delete" style="text-decoration: none;">
+                  <svg xmlns="http://www.w3.org/2000/svg" height="30" viewBox="0 -960 960 960" width="30" fill="#e74c3c">
+                    <path d="m336-280 144-144 144 144 56-56-144-144 144-144-56-56-144 144-144-144-56 56 144 144-144 144 56 56ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" />
+                  </svg>
+                </a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="5" style="text-align: center; padding: 20px; color: #888;">Você não possui pacotes registrados.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="custom-modal" id="modalPacote">
+      <div class="modal-container">
+        <h2>Vender Novo Pacote</h2>
+        <form action="{% url 'adicionar_pacote_cliente' %}" method="POST">
+          {% csrf_token %}
+          <div class="form-group">
+            <label>Selecione o Cliente</label>
+            <select name="cliente" class="input-date-agenda" required>
+              <option value="">Escolha um cliente...</option>
+              {% for c in clientes_list %}
+                <option value="{{ c.id }}">{{ c.get_full_name|default:c.username }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="modal-actions">
+            <button type="submit" class="btn-success">Confirmar</button>
+            <button type="button" onclick="closeM()" class="btn-bloquear">Cancelar</button>
+          </div>
+        </form> 
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const modal = document.getElementById('modalPacote')
+        const btnOpen = document.getElementById('openModalPacote')
+      
+        if (btnOpen && modal) {
+          btnOpen.addEventListener('click', (e) => {
+            e.preventDefault()
+            modal.classList.add('active')
+          })
+        }
+      
+        window.closeM = function () {
+          if (modal) {
+            modal.classList.remove('active')
+          }
+        }
+      
+        window.addEventListener('click', (event) => {
+          if (event.target === modal) {
+            closeM()
+          }
+        })
+      
+        document.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape' && modal.classList.contains('active')) {
+            closeM()
+          }
+        })
+      })
+    </script>
+  </div>
+{% endblock %}

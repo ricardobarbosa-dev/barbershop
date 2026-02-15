@@ -1,0 +1,138 @@
+.package {
+    padding-top: 2rem;
+    padding-left: 1rem;
+}
+
+.package h3 {
+    font-size: 1.2rem;
+}
+
+.package p {
+    color: #888888;
+    font-size: 0.7rem;
+}
+
+.pacote-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.pacote-topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.pacote-tag {
+    font-size: 11px;
+    font-weight: 600;
+    color: #FFD700;
+    text-transform: uppercase;
+}
+
+.pacote-topo h4 {
+    margin: 4px 0 0;
+}
+
+.status {
+    padding: 5px 0px;
+    width: 4rem;
+    border-radius: 30px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .8px;
+    text-align: center;
+}
+
+
+.status.ativo {
+    background: rgba(46, 204, 113, 0.15);
+    color: #2ECC71;
+    border: 1px solid #2ECC71;
+}
+
+.status.inativo {
+    background: rgba(231, 76, 60, 0.15);
+    color: #E74C3C;
+    border: 1px solid #E74C3C;
+}
+
+.pacote-creditos {
+    font-size: 3rem;
+    font-weight: bold;
+}
+
+.pacote-creditos span {
+    font-size: 14px;
+    font-weight: normal;
+}
+
+.pacote-barra {
+    width: 100%;
+    height: 6px;
+    background: #888888;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.pacote-barra-preenchida {
+    height: 100%;
+    background: #FFD700;
+    border-radius: 10px;
+}
+
+.pacote-total {
+    font-size: 12px;
+    color: #777;
+}
+
+.pacote-validade {
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pacote-acoes {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.btn-credito {
+    background: #f5a623;
+    color: #000;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-agendar {
+    border: 1px solid #ddd;
+    padding: 10px 14px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    color: #000;
+}
+
+.pacote-alerta {
+    border: 1px solid #f5a623;
+    box-shadow: 0 0 0 2px rgba(245, 166, 35, 0.15);
+}
+
+.pacote-esgotado {
+    border: 1px solid #d93025;
+    box-shadow: 0 0 0 2px rgba(217, 48, 37, 0.15);
+    opacity: 0.85;
+}
+
+
+@media (min-width: 1024px) {
+    .package {
+        display: none;
+    }
+}

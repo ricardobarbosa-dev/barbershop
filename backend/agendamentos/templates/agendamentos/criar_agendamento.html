@@ -1,0 +1,66 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}
+  Dashboard Cliente | Reserva Horário
+{% endblock %}
+
+{% block content %}
+  <link rel="stylesheet" href="{% static 'accounts/css/perfil.css' %}" />
+  <div class="container-card">
+    <section id="card" class="principal">
+      <div class="profile-container">
+        <form method="POST" id="agendamento-form">
+          {% csrf_token %}
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="servico">Serviço</label>
+              <select name="servico" id="servico" required>
+                <option value="">Selecione o serviço</option>
+                {% for s in servicos %}
+                  <option value="{{ s.id }}">{{ s.nome }} - R$ {{ s.preco }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="barbeiro">Profissional</label>
+              <select name="barbeiro" id="barbeiro_select" required>
+                <option value="">Selecione</option>
+                {% for b in barbeiros %}
+                  <option value="{{ b.id }}">{{ b.nome|title }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="data">Data</label>
+              <input type="date" name="data" id="data_input" required min="{{ today|date:'Y-m-d' }}" />
+            </div>
+
+            <div class="form-group full-width">
+              <label>Horários Disponíveis</label>
+              <div id="horarios-container" class="slots-grid">
+                <p class="no-slots">Selecione o profissional e a data para ver os horários.</p>
+              </div>
+              <input type="hidden" name="horario" id="horario_selecionado" required />
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-primary" id="btn-reservar">
+              Reservar
+              <span class="loader" id="reserva-loader" style="display: none;"></span>
+            </button>
+            <a href="{% url 'dashboard_cliente' %}" class="btn-back">Voltar</a>
+          </div>
+        </form>
+      </div>
+    </section>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'accounts/js/perfil.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login por telefone</title>
+
+    <link rel="stylesheet" href="{% static 'accounts/css/login.css' %}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.min.css" />
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="login-card">
+        <h1>Entrar</h1>
+        <p>Informe seu número</p>
+
+        <form method="POST" id="phone-form">
+          {% csrf_token %}
+
+          <input type="tel" id="telefone" placeholder="(11) 99999-9999" required />
+
+          <input type="hidden" name="telefone" id="telefone-completo" />
+
+          <button type="submit">
+            Enviar código
+            <span class="loader"></span>
+          </button>
+        </form>
+
+        <a href="{% url 'login' %}" class="back-link">← Voltar</a>
+      </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
+
+    <script>
+      const input = document.querySelector('#telefone')
+      const hiddenInput = document.querySelector('#telefone-completo')
+      
+      const iti = window.intlTelInput(input, {
+        initialCountry: 'auto',
+        geoIpLookup: (callback) => {
+          fetch('https://ipapi.co/json/')
+            .then((res) => res.json())
+            .then((data) => callback(data.country_code.toLowerCase()))
+            .catch(() => callback('br'))
+        },
+        preferredCountries: ['br', 'us'],
+        separateDialCode: true,
+        utilsScript: 'https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js'
+      })
+      
+      document.getElementById('phone-form').addEventListener('submit', function () {
+        hiddenInput.value = iti.getNumber()
+      })
+    </script>
+
+    <script>
+const messages = [
+{% for message in messages %}
+{ text: "{{ message }}", type: "{{ message.tags }}" },
+{% endfor %}
+];
+</script>
+    <script src="{% static 'js/toast.js' %}"></script>
+  </body>
+</html>
