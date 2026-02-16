@@ -601,6 +601,7 @@ section.location {
 
 section.location iframe {
     border-radius: 0.6rem;
+    width: 90%;
 }
 
 section.location:hover {
