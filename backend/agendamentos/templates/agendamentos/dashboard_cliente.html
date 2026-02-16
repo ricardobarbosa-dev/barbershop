@@ -31,19 +31,32 @@
             </svg>
             <span>Agenda</span>
           </a>
+
+          <a href="{% url 'minha_agenda_barbeiro' %}" class="menu-item {% if request.resolver_match.url_name == 'minha_agenda_barbeiro' %}active{% endif %}">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+              <path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v255l-80 80v-175H200v400h248l80 80H200Zm0-560h560v-80H200v80Zm0 0v-80 80ZM662-60 520-202l56-56 85 85 170-170 56 57L662-60Z" />
+            </svg><span>Atendimentos</span>
+          </a>
+
+          <a href="{% url 'gerenciar_pacotes' %}" class="menu-item {% if request.resolver_match.url_name == 'gerenciar_pacotes' %}active{% endif %}">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+              <path d="M600-800H360v280h240v-280Zm200 0H680v280h120v-280ZM575-440H320v240h222q21 0 40.5-7t35.5-21l166-137q-8-8-18-12t-21-6q-17-3-33 1t-30 15l-108 87H400v-80h146l44-36q5-3 7.5-8t2.5-11q0-10-7.5-17.5T575-440Zm-335 0h-80v280h80v-280Zm40 0v-360q0-33 23.5-56.5T360-880h440q33 0 56.5 23.5T880-800v280q0 33-23.5 56.5T800-440H280ZM240-80h-80q-33 0-56.5-23.5T80-160v-280q0-33 23.5-56.5T160-520h415q85 0 164 29t127 98l27 41-223 186q-27 23-60 34.5T542-120H309q-11 18-29 29t-40 11Z" />
+            </svg>
+            <span>Pacotes</span>
+          </a>
+
+          <a href="{% url 'editar_perfil_barbeiro' %}" class="menu-item {% if request.resolver_match.url_name == 'editar_perfil_barbeiro' %}active{% endif %}">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
+              <path d="m370-120-7-102q-21-5-41.5-15.5T284-263l-94 39-80-139 81-61q-2-10-2-20t2-20l-81-61 80-139 94 39q17-15 37.5-25.5T363-738l7-102h160l7 102q21 5 41.5 15.5T620-697l94-39 80 139-81 61q2 10 2 20t-2 20l81 61-80 139-94-39q-17 15-37.5 25.5T541-222l-7 102H370Zm110-260q42 0 71-29t29-71q0-42-29-71t-71-29q-42 0-71 29t-29 71q0 42 29 71t71 29Z" />
+            </svg>
+            <span>Meu Perfil</span>
+          </a>
         {% else %}
           <a href="{% url 'dashboard_cliente' %}" class="menu-item {% if request.resolver_match.url_name == 'dashboard_cliente' %}active{% endif %}">
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
               <path d="M520-600v-240h320v240H520ZM120-440v-400h320v400H120Zm400 320v-400h320v400H520Zm-400 0v-240h320v240H120Zm80-400h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Z" />
             </svg>
             <span>Início</span>
-          </a>
-
-          <a href="{% url 'perfil_cliente' %}" class="menu-item {% if request.resolver_match.url_name == 'perfil_cliente' %}active{% endif %}">
-            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
-              <path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Z" />
-            </svg>
-            <span>Dados</span>
           </a>
 
           <a href="{% url 'meus_pacotes' %}" class="menu-item {% if request.resolver_match.url_name == 'meus_pacotes' %}active{% endif %}">
@@ -65,6 +78,13 @@
               <path d="M340-720q-33 0-56.5-23.5T260-800q0-33 23.5-56.5T340-880q33 0 56.5 23.5T420-800q0 33-23.5 56.5T340-720Zm220 560H302q-33 0-60.5-23.5T207-240l-87-440h82l88 440h270v80Zm220 80L664-280H386q-29 0-50.5-17.5T308-344l-44-214q-11-48 22.5-85t81.5-37q35 0 63.5 21t36.5 57l44 202h130q21 0 39 11t29 29l140 240-70 40Z" />
             </svg>
             <span>Reserva</span>
+          </a>
+
+          <a href="/accounts/logout/" class="logout-mobile">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
+              <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z" />
+            </svg>
+            <span>Sair</span>
           </a>
         {% endif %}
       </nav>
@@ -106,11 +126,14 @@
               {{ cargo_cliente }}
             </span>
           </div>
-          {% if user.profile.foto %}
-            <img src="{{ user.profile.foto.url }}" alt="Foto" class="avatar" />
-          {% else %}
-            <div class="avatar-placeholder"></div>
-          {% endif %}
+
+          <a href="{% url 'perfil_cliente' %}" class="menu-item {% if request.resolver_match.url_name == 'perfil_cliente' %}active{% endif %}">
+            {% if user.profile.foto %}
+              <img src="{{ user.profile.foto.url }}" alt="Foto" class="avatar" />
+            {% else %}
+              <div class="avatar-placeholder">{{ user.first_name|slice:':1' }}</div>
+            {% endif %}
+          </a>
         </div>
       </header>
 

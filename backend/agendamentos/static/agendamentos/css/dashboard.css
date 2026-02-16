@@ -138,6 +138,10 @@ body {
     gap: 1rem;
 }
 
+.logout-mobile {
+    display: block;
+}
+
 .icon-yellow {
     background-color: var(--btn-primary);
     color: #000;
@@ -338,7 +342,19 @@ body {
     border-radius: 50%;
     background: #333;
     border: 1px solid var(--btn-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--btn-primary);
+    font-weight: bold;
+    text-transform: uppercase;
+    font-family: sans-serif;
+    transition: all 0.3s ease;
+}
 
+.avatar,
+.avatar-placeholder:hover {
+    transform: scale(1.1);
 }
 
 .main-content {
@@ -1199,8 +1215,16 @@ input[type="time"]::-webkit-calendar-picker-indicator {
         border-radius: 10px;
     }
 
+    .menu-nav a.logout-mobile {
+        display: none;
+    }
+
     .breadcrumb strong {
         color: var(--text-color);
+    }
+
+    .logout-mobile {
+        display: none;
     }
 
     .logout {
