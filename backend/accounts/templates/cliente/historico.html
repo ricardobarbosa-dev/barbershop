@@ -179,7 +179,7 @@
         {% endfor %}
 
         {% if page_obj.has_next %}
-          <a href="?page={{ page_obj.next_page_number }}">›</a>
+          <a href="?page={{ page_obj.next_page_number }}&status={{ status_atual }}">></a>
         {% endif %}
       </div>
     </div>
