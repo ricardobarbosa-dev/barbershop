@@ -411,7 +411,7 @@ def avaliar_barbeiro(request, agendamento_id):
                 barbeiro=barbeiro_target,
                 agendamento=agendamento,
                 nota=nota
-            )
+            ) 
             messages.success(request, "Avaliação enviada com sucesso! ⭐")
 
         return redirect('perfil_barbeiro', user_id=barbeiro_target.id)
