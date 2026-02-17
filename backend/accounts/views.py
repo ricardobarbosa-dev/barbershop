@@ -225,29 +225,23 @@ def trocar_senha(request):
 # historico
 @login_required
 def historico_cliente(request):
-    # 1. Pega o status da URL (ex: ?status=PENDENTE)
     status_atual = request.GET.get('status', 'PENDENTE')
 
-    # 2. Filtra os agendamentos baseado no status selecionado
-    # Usamos o status_atual aqui para o Paginator mostrar a lista filtrada
     agendamentos_lista = Agendamento.objects.filter(
         cliente=request.user,
         status=status_atual
     ).select_related('barbeiro', 'servico').order_by('-data', '-horario')
 
-    # 3. Paginação (5 por página)
     paginator = Paginator(agendamentos_lista, 5) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    # 4. Calcula os totais (isso independe da página atual)
     total_pendentes = Agendamento.objects.filter(cliente=request.user, status='PENDENTE').count()
     total_concluidos = Agendamento.objects.filter(cliente=request.user, status='CONCLUIDO').count()
     total_cancelados = Agendamento.objects.filter(cliente=request.user, status='CANCELADO').count()
 
-    # 5. O ÚNICO return que envia tudo para o HTML
     return render(request, 'cliente/historico.html', {
-        'page_obj': page_obj,             # Lista oficial para o loop no HTML
+        'page_obj': page_obj,            
         'status_atual': status_atual,
         'total_pendentes': total_pendentes,
         'total_concluidos': total_concluidos,
