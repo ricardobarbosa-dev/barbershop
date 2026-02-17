@@ -9,7 +9,15 @@
 {% endblock %}
 
 {% block content %}
+  <div class="appointments">
+    <h3>Meus Agendamentos</h3>
+  </div>
+
   <!-- MOBILE -->
+  <header class="header-text">
+    <h1>HISTÓRICO E <span>AGENDAMENTOS</span></h1>
+    <p>Veja seu histórico e seus agendamentos.</p>
+  </header>
   <div class="card-mobile">
     {% if page_obj %}
       {% for a in page_obj %}
@@ -76,7 +84,7 @@
 
   <!-- DESKTOP -->
   <header class="header-text" style="padding-left: 5rem;">
-    <h3>HISTÓRICO E <span>AGENDAMENTOS</span></h3>
+    <h1>HISTÓRICO E <span>AGENDAMENTOS</span></h1>
     <p>Veja seu histórico e seus agendamentos.</p>
   </header>
   <div class="table-container">
