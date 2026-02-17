@@ -142,9 +142,11 @@
     bottom: 20px;
     right: 20px;
     z-index: 999999 !important;
-    display: flex;
     flex-direction: column-reverse;
     gap: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .toast {
