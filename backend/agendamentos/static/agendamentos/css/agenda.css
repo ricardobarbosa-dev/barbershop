@@ -572,6 +572,48 @@
     font-size: 12px !important;
 }
 
+.bloqueio-destaque {
+    border-left: 5px solid #e74c3c !important;
+    background-color: #fff5f5 !important;
+}
+
+.bloqueio-linha {
+    border-left: 4px solid #e74c3c !important;
+    background-color: rgba(231, 76, 60, 0.05);
+}
+
+.bloqueio-agrupado {
+    border-left: 5px dashed #e74c3c !important;
+    background-color: #fffafa !important;
+    padding: 1.5rem !important;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+.badge-bloqueio {
+    background: #e74c3c;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.tabs-agenda-container {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    width: 100%;
+}
+
+.flex-gap-10 {
+    display: flex;
+    gap: 10px;
+}
+
+.full-width {
+    width: 100%;
+}
 
 @media (min-width: 1024px) {
     .container-card {
