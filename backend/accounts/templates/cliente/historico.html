@@ -14,6 +14,10 @@
   </div>
 
   <!-- MOBILE -->
+  <header class="header-text">
+    <h1>HISTÓRICO E <span>AGENDAMENTOS</span></h1>
+    <p>Veja seu histórico e seus agendamentos.</p>
+  </header>
   <div class="card-mobile">
     {% if page_obj %}
       {% for a in page_obj %}
@@ -79,9 +83,9 @@
   </div>
 
   <!-- DESKTOP -->
-  <header class="header-text">
-    <h1>ABRIR <span>AGENDA</span></h1>
-    <p>Abrir minha agenda da semana.</p>
+  <header class="header-text" style="padding-left: 5rem;">
+    <h1>HISTÓRICO E <span>AGENDAMENTOS</span></h1>
+    <p>Veja seu histórico e seus agendamentos.</p>
   </header>
   <div class="table-container">
     <div class="table-header">
@@ -151,7 +155,7 @@
           {% endfor %}
         {% else %}
           <tr>
-            <td colspan="5" style="text-align:center; padding:30px;">Você ainda não possui histórico.</td>
+            <td colspan="5" style="text-align:center; padding:30px; color: #888888;">Você ainda não possui histórico.</td>
           </tr>
         {% endif %}
       </tbody>
@@ -327,7 +331,7 @@
           {% endfor %}
         {% else %}
           <tr>
-            <td colspan="5" style="text-align:center; padding: 30px;">Você não possui agendamentos.</td>
+            <td colspan="5" style="text-align:center; padding: 30px; color: #888888;">Você não possui agendamentos.</td>
           </tr>
         {% endif %}
       </tbody>

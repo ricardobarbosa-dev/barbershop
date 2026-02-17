@@ -13,6 +13,7 @@ from django import forms
 from django.contrib.auth.decorators import login_required
 from .forms import UserUpdateForm, ProfileUpdateForm, ProfileForm, ExtendedUserCreationForm
 from agendamentos.models import Agendamento
+from agendamentos.views import listar_agendamentos
 from django.core.paginator import Paginator
 from .decorators import no_access
 
@@ -129,7 +130,7 @@ def verificar_otp_view(request):
 
     return render(request, 'accounts/verificar_otp.html')
     
-# Perfil Cliente
+# Perfil Cliente 
 @login_required
 def perfil_cliente(request):
     profile, _ = Profile.objects.get_or_create(user=request.user)
