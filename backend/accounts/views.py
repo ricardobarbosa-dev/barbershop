@@ -18,6 +18,12 @@ from django.core.paginator import Paginator
 from .decorators import no_access
 
 
+from agendamentos.views import listar_agendamentos
+@login_required
+def meu_perfil(request):
+    return listar_agendamentos(request)
+
+
 # Login tradicional
 @no_access
 def login_view(request):
