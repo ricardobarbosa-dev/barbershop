@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.db.models import Avg, Count, Sum, Case, When, Value, IntegerField
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.utils import timezone
 from datetime import datetime, timedelta
@@ -13,6 +13,13 @@ from servicos.models import Servico
 from barbeiros.models import Barbeiro
 from barbearia.models import ConfiguracaoBarbearia
 from .utils import gerar_slots_horarios
+
+# ==========================================
+# VERIFICAR SE É STAFF
+# ==========================================
+def e_staff(user):
+    return user.is_authenticated and user.is_staff
+
 
 # ==========================================
 # VIEWS DO CLIENTE
@@ -75,7 +82,7 @@ def listar_agendamentos(request):
     return render(request, 'agendamentos/listar_agendamentos.html', {
         'agendamentos': agendamentos,
         'status_atual': status,
-        'total_pendentes': total_pendentes,
+        'total_pendentes': total_pendentes, 
         'total_concluidos': total_concluidos,
         'total_cancelados': total_cancelados,
     })
@@ -94,8 +101,6 @@ def criar_agendamento(request):
         if not all([servico_id, barbeiro_id, data, horario]):
             messages.error(request, 'Por favor, preencha todos os campos.')
             return redirect('criar_agendamento')
-
-        # Verifica ocupação (incluindo bloqueios)
         existe = Agendamento.objects.filter(
             barbeiro_id=barbeiro_id,
             data=data,
@@ -142,7 +147,7 @@ def cancelar_agendamento(request, agendamento_id):
 # VIEWS DO BARBEIRO (DASHBOARD E AGENDA)
 # ==========================================
 
-@login_required
+@user_passes_test(e_staff)
 def dashboard_barbeiro(request):
     barbeiro = get_object_or_404(Barbeiro, user=request.user)
     hoje = timezone.localdate()
@@ -167,12 +172,8 @@ def dashboard_barbeiro(request):
         'faturamento_mes': faturamento_mes,
     })
 
-@login_required
+@user_passes_test(e_staff)
 def agenda_barbeiro(request):
-    is_prof = request.user.is_staff or request.user.groups.filter(name='funcionario').exists()
-    if not is_prof:
-        return redirect('dashboard_cliente')
-
     barbeiro_perfil = get_object_or_404(Barbeiro, user=request.user)
     data_str = request.GET.get('data')
     data_filtro = datetime.strptime(data_str, '%Y-%m-%d').date() if data_str else timezone.localdate()
@@ -187,7 +188,7 @@ def agenda_barbeiro(request):
         'data_selecionada': data_filtro
     })
 
-@login_required
+@user_passes_test(e_staff)
 def concluir_agendamento(request, agendamento_id):
     agendamento = get_object_or_404(Agendamento, id=agendamento_id)
     
@@ -200,10 +201,8 @@ def concluir_agendamento(request, agendamento_id):
         if pacote:
             if not pacote.expirado() and pacote.cortes_restantes() > 0:
                 pacote.cortes_usados += 1
-                
                 if pacote.cortes_restantes() <= 0:
                     pacote.ativo = False
-                
                 pacote.save()
                 messages.info(request, f"Corte debitado do pacote! Restam {pacote.cortes_restantes()}.")
             else:
@@ -217,11 +216,8 @@ def concluir_agendamento(request, agendamento_id):
 
     return redirect('minha_agenda_barbeiro')
 
-@login_required
+@user_passes_test(e_staff)
 def gerenciar_pacotes(request):
-    if not request.user.is_staff:
-        return redirect('home')
-
     pacotes = PacoteCorte.objects.all().order_by('-ativo', '-data_inicio')
     clientes = User.objects.filter(is_staff=False).order_by('username')
 
@@ -231,7 +227,7 @@ def gerenciar_pacotes(request):
         'data_selecionada': timezone.now()
     })
 
-@login_required
+@user_passes_test(e_staff)
 def atualizar_status_agendamento(request, agendamento_id, status):
     agendamento = get_object_or_404(Agendamento, id=agendamento_id)
     agendamento.status = status.upper()
@@ -244,7 +240,8 @@ def atualizar_status_agendamento(request, agendamento_id, status):
 # ==========================================
 # BLOQUEIO DE HORÁRIOS
 # ==========================================
-@login_required
+
+@user_passes_test(e_staff)
 def bloquear_agenda(request):
     if request.method == 'POST':
         barbeiro = get_object_or_404(Barbeiro, user=request.user)
@@ -268,17 +265,15 @@ def bloquear_agenda(request):
             atual += timedelta(minutes=intervalo)
 
         messages.success(request, 'Agenda bloqueada!')
-        
         url = reverse('minha_agenda_barbeiro')
         return redirect(f"{url}?data={data}")
 
-@login_required
+@user_passes_test(e_staff)
 def remover_bloqueio(request, pk):
     agendamento = get_object_or_404(Agendamento, pk=pk)
     data = agendamento.data
     agendamento.delete()
     messages.success(request, "Horário liberado!")
-    
     url = reverse('minha_agenda_barbeiro')
     return redirect(f"{url}?data={data}")
 
@@ -286,7 +281,7 @@ def remover_bloqueio(request, pk):
 # DISPONIBILIDADE E AJAX
 # ==========================================
 
-@login_required
+@user_passes_test(e_staff)
 def configurar_agenda(request):
     if request.method == 'POST':
         dia = request.POST.get('dia_semana')
@@ -304,13 +299,13 @@ def configurar_agenda(request):
     configuracoes = DisponibilidadeBarbeiro.objects.filter(barbeiro=request.user).order_by('dia_semana')
     return render(request, 'barbeiro/agenda.html', {'configuracoes': configuracoes})
 
-@login_required
+@user_passes_test(e_staff)
 def excluir_disponibilidade(request, id):
     get_object_or_404(DisponibilidadeBarbeiro, id=id, barbeiro=request.user).delete()
     return redirect('agenda')
 
-
 def buscar_horarios_ajax(request):
+    # Aberta para clientes poderem agendar
     barbeiro_id = request.GET.get('barbeiro')
     data_str = request.GET.get('data')
     
@@ -318,25 +313,17 @@ def buscar_horarios_ajax(request):
         return JsonResponse({'horarios': []})
 
     data_obj = datetime.strptime(data_str, '%Y-%m-%d').date()
-    
     disp = DisponibilidadeBarbeiro.objects.filter(
-        barbeiro_id=barbeiro_id, 
-        dia_semana=data_obj.weekday(), 
-        ativo=True
+        barbeiro_id=barbeiro_id, dia_semana=data_obj.weekday(), ativo=True
     ).first()
     
-    if not disp: 
-        return JsonResponse({'horarios': []})
+    if not disp: return JsonResponse({'horarios': []})
 
     ocupados = Agendamento.objects.filter(
-        barbeiro_id=barbeiro_id, 
-        data=data_obj
+        barbeiro_id=barbeiro_id, data=data_obj
     ).exclude(status='CANCELADO').values_list('horario', flat=True)
 
-    bloqueios = BloqueioAgenda.objects.filter(
-        barbeiro_id=barbeiro_id,
-        data=data_obj
-    )
+    bloqueios = BloqueioAgenda.objects.filter(barbeiro_id=barbeiro_id, data=data_obj)
     
     slots = []
     atual = datetime.combine(data_obj, disp.hora_inicio)
@@ -345,18 +332,14 @@ def buscar_horarios_ajax(request):
 
     while atual < fim:
         horario_time = atual.time()
-        
         esta_ocupado = horario_time in ocupados
-        
         esta_bloqueado = any(b.hora_inicio <= horario_time < b.hora_fim for b in bloqueios)
-        
         ja_passou = atual <= agora
 
         slots.append({
             'hora': horario_time.strftime('%H:%M'),
             'disponivel': not (esta_ocupado or esta_bloqueado or ja_passou)
         })
-        
         atual += timedelta(minutes=disp.intervalo_minutos)
     
     return JsonResponse({'horarios': slots})
@@ -367,27 +350,23 @@ def buscar_horarios_ajax(request):
 
 @login_required
 def meus_pacotes(request):
+    # Aberta para o cliente ver seus próprios pacotes
     pacotes = PacoteCorte.objects.filter(cliente=request.user).order_by('-data_inicio')
     return render(request, 'agendamentos/meus_pacotes.html', {'pacotes': pacotes})
 
-@login_required
+@user_passes_test(e_staff)
 def adicionar_pacote_cliente(request):
-    if request.method == 'POST' and request.user.is_staff:
+    if request.method == 'POST':
         cliente_id = request.POST.get('cliente')
         cliente = get_object_or_404(User, id=cliente_id)
         
         PacoteCorte.objects.filter(cliente=cliente, ativo=True).update(ativo=False)
-        PacoteCorte.objects.create(
-            cliente=cliente,
-            total_cortes=4,
-            cortes_usados=0,
-            ativo=True
-        )
+        PacoteCorte.objects.create(cliente=cliente, total_cortes=4, cortes_usados=0, ativo=True)
         
         messages.success(request, f"Pacote de 4 cortes ativado para {cliente.first_name}!")
     return redirect('gerenciar_pacotes')
 
-@login_required
+@user_passes_test(e_staff)
 def remover_pacote(request, pk):
     pacote = get_object_or_404(PacoteCorte, pk=pk)
     nome_cliente = pacote.cliente.get_full_name() or pacote.cliente.username
@@ -396,17 +375,13 @@ def remover_pacote(request, pk):
     return redirect('gerenciar_pacotes')
 
 def perfil_barbeiro(request, user_id):
+    # Pública para todos verem as avaliações do barbeiro
     barbeiro_user = get_object_or_404(User, id=user_id)
-    
     avaliacoes = Avaliacao.objects.filter(barbeiro=barbeiro_user)
     media = avaliacoes.aggregate(media=Avg('nota'))['media'] or 0
-    
     ja_avaliou = False
     if request.user.is_authenticated:
-        ja_avaliou = Avaliacao.objects.filter(
-            cliente=request.user, 
-            barbeiro=barbeiro_user
-        ).exists()
+        ja_avaliou = Avaliacao.objects.filter(cliente=request.user, barbeiro=barbeiro_user).exists()
 
     return render(request, 'agendamentos/perfil_barbeiro.html', {
         'barbeiro': barbeiro_user, 
