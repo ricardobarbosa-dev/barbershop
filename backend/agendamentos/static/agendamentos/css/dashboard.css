@@ -62,6 +62,19 @@ h4 a:hover {
     font-size: 12px;
 }
 
+.header-text-mobile {
+    padding: 1rem;
+}
+
+.header-text-mobile span {
+    color: var(--btn-primary);
+}
+
+.header-text-mobile p {
+    color: var(--text-second);
+    font-size: 12px;
+}
+
 body {
     font-family: 'Poppins', sans-serif;
     background-color: var(--background-main);
@@ -1259,6 +1272,10 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     .breadcrumb {
         display: block;
         color: #666;
+    }
+
+    .header-text-mobile {
+        display: none;
     }
 
     .user-info {
