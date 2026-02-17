@@ -393,8 +393,8 @@ def perfil_barbeiro(request, user_id):
     })
 
 @login_required
-def avaliar_barbeiro(request, agendamento_id):
-    if request.method == "POST":
+def avaliar_barbeiro(request, agendamento_id): 
+    if request.method == "POST": 
         agendamento = get_object_or_404(Agendamento, id=agendamento_id)
         try:
             barbeiro_target = agendamento.barbeiro.user
