@@ -63,4 +63,26 @@
 
 {% block scripts %}
   <script src="{% static 'accounts/js/perfil.js' %}"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const inputData = document.querySelector('input[type="date"]')
+    
+      const hoje = new Date().toISOString().split('T')[0]
+      inputData.setAttribute('min', hoje)
+    
+      inputData.addEventListener('change', function () {
+        const dataSelecionada = this.value
+    
+        fetch(`/api/datas-bloqueadas/`)
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.bloqueadas.includes(dataSelecionada)) {
+              alert('Esta data está bloqueada para novos agendamentos.')
+              this.value = ''
+            }
+          })
+      })
+    })
+  </script>
 {% endblock %}

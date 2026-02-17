@@ -67,6 +67,17 @@ def dashboard_cliente(request):
         'faltam_para_nivel': faltam_para_nivel,
     })
 
+@user_passes_test(e_staff)
+def gerenciar_bloqueios(request):
+    if request.method == 'POST':
+        data = request.POST.get('data_bloqueio')
+        BloqueioData.objects.get_or_create(data=data)
+        messages.success(request, "Data bloqueada com sucesso!")
+        return redirect('agenda_barbeiro')
+    
+    bloqueios = BloqueioData.objects.filter(data__gte=timezone.localdate())
+    return render(request, 'barbeiro/bloqueios.html', {'bloqueios': bloqueios})
+
 @login_required 
 def listar_agendamentos(request):
     status = request.GET.get('status', 'PENDENTE')
