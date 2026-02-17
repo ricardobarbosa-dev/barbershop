@@ -62,6 +62,21 @@ h4 a:hover {
     font-size: 12px;
 }
 
+
+/* historico */
+.header-historico {
+    padding: 1rem;
+}
+
+.header-historico span {
+    color: var(--btn-primary);
+}
+
+.header-historico p {
+    color: var(--text-second);
+    font-size: 12px;
+}
+
 body {
     font-family: 'Poppins', sans-serif;
     background-color: var(--background-main);
@@ -1221,6 +1236,10 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 
     .breadcrumb strong {
         color: var(--btn-primary);
+    }
+
+    .header-historico {
+        padding: 5rem;
     }
 
     .logout-mobile {
