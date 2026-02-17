@@ -13,15 +13,8 @@ from django import forms
 from django.contrib.auth.decorators import login_required
 from .forms import UserUpdateForm, ProfileUpdateForm, ProfileForm, ExtendedUserCreationForm
 from agendamentos.models import Agendamento
-from agendamentos.views import listar_agendamentos
 from django.core.paginator import Paginator
 from .decorators import no_access
-
-
-from agendamentos.views import listar_agendamentos
-@login_required
-def meu_perfil(request):
-    return listar_agendamentos(request)
 
 
 # Login tradicional
@@ -232,19 +225,34 @@ def trocar_senha(request):
 # historico
 @login_required
 def historico_cliente(request):
+    # 1. Pega o status da URL (ex: ?status=PENDENTE)
+    status_atual = request.GET.get('status', 'PENDENTE')
 
+    # 2. Filtra os agendamentos baseado no status selecionado
+    # Usamos o status_atual aqui para o Paginator mostrar a lista filtrada
     agendamentos_lista = Agendamento.objects.filter(
-        cliente=request.user
+        cliente=request.user,
+        status=status_atual
     ).select_related('barbeiro', 'servico').order_by('-data', '-horario')
 
+    # 3. Paginação (5 por página)
     paginator = Paginator(agendamentos_lista, 5) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    return render(request, 'cliente/historico.html', {
-        'page_obj': page_obj
-    })
+    # 4. Calcula os totais (isso independe da página atual)
+    total_pendentes = Agendamento.objects.filter(cliente=request.user, status='PENDENTE').count()
+    total_concluidos = Agendamento.objects.filter(cliente=request.user, status='CONCLUIDO').count()
+    total_cancelados = Agendamento.objects.filter(cliente=request.user, status='CANCELADO').count()
 
+    # 5. O ÚNICO return que envia tudo para o HTML
+    return render(request, 'cliente/historico.html', {
+        'page_obj': page_obj,             # Lista oficial para o loop no HTML
+        'status_atual': status_atual,
+        'total_pendentes': total_pendentes,
+        'total_concluidos': total_concluidos,
+        'total_cancelados': total_cancelados,
+    })
 # avaliacao
 @login_required
 def editar_perfil_barbeiro(request):
