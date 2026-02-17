@@ -1220,7 +1220,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     }
 
     .breadcrumb strong {
-        color: var(--text-color);
+        color: var(--btn-primary);
     }
 
     .logout-mobile {
