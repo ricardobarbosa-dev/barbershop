@@ -16,12 +16,12 @@
       </svg>Meus Agendamentos
     </h3>
 
-    <div class="filtro-agendamentos" style="margin-top: 15px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
+    <div class="filtro-agendamentos" style="margin: 20px 0; display: flex; flex-wrap: wrap; gap: 10px;">
       <a href="?status=PENDENTE" class="filtro-btn {% if status_atual == 'PENDENTE' %}ativo{% endif %}">Pendentes <span>{{ total_pendentes }}</span></a>
       <a href="?status=CONCLUIDO" class="filtro-btn {% if status_atual == 'CONCLUIDO' %}ativo{% endif %}">Concluídos <span>{{ total_concluidos }}</span></a>
       <a href="?status=CANCELADO" class="filtro-btn {% if status_atual == 'CANCELADO' %}ativo{% endif %}">Cancelados <span>{{ total_cancelados }}</span></a>
       {% if status_atual %}
-        <a href="?" class="filtro-btn" style="background: #444; color: #fff;">Ver Todos</a>
+        <a href="?" class="filtro-btn" style="background: #444; color: #fff; text-decoration: none; padding: 5px 15px; border-radius: 5px;">Ver Todos</a>
       {% endif %}
     </div>
   </div>
@@ -29,7 +29,7 @@
   <div class="card-mobile">
     {% if agendamentos %}
       {% for a in agendamentos %}
-        <section id="card-{{ a.id }}" class="card-item {% if a.status != 'PENDENTE' %}disabled{% endif %}">
+        <section class="card-item {% if a.status != 'PENDENTE' %}disabled{% endif %}" style="margin-bottom: 15px; border: 1px solid #333; padding: 15px; border-radius: 8px;">
           <div class="card-header">
             <div class="info-service">
               <h3 style="{% if a.status != 'PENDENTE' %} text-decoration: line-through; opacity: .6;{% endif %}">{{ a.servico.nome }}</h3>
@@ -50,18 +50,13 @@
 
           <div class="card-details">
             <div class="barber-info">
-              <img src="https://cdn-icons-png.flaticon.com/512/219/219983.png" alt="Barbeiro" />
+              <img src="https://cdn-icons-png.flaticon.com/512/219/219983.png" alt="Barbeiro" style="width: 40px; border-radius: 50%;" />
               <div>
                 <span>BARBEIRO</span>
                 <h4>{{ a.barbeiro.nome }}</h4>
               </div>
             </div>
             <div class="date-info">
-              <div class="icon-clock">
-                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
-                  <path d="M582-298 440-440v-200h80v167l118 118-56 57ZM440-720v-80h80v80h-80Zm280 280v-80h80v80h-80ZM440-160v-80h80v80h-80ZM160-440v-80h80v80h-80ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" />
-                </svg>
-              </div>
               <div>
                 <span>DATA/HORA</span>
                 <h4>{{ a.data|date:'d M' }} • {{ a.horario }}</h4>
@@ -69,11 +64,11 @@
             </div>
           </div>
 
-          <div class="card-actions">
+          <div class="card-actions" style="margin-top: 10px;">
             {% if a.status == 'PENDENTE' %}
-              <form method="POST" action="{% url 'cancelar_agendamento' a.id %}" style="display:inline;">
+              <form method="POST" action="{% url 'cancelar_agendamento' a.id %}">
                 {% csrf_token %}
-                <button type="submit" class="btn-cancel" onclick="return confirm('Tem certeza que deseja cancelar este agendamento?')">CANCELAR</button>
+                <button type="submit" class="btn-cancel" onclick="return confirm('Tem certeza?')">CANCELAR</button>
               </form>
             {% else %}
               —
@@ -88,7 +83,7 @@
 
   <div class="table-container">
     <div class="table-header">
-      <h2>Meus Agendamentos</h2>
+      <h2>Listagem Detalhada</h2>
       <button class="btn-export">EXPORTAR PDF</button>
     </div>
     <table class="appointments-table">
@@ -106,21 +101,19 @@
           {% for a in agendamentos %}
             <tr class="{% if a.status != 'PENDENTE' %}disabled{% endif %}">
               <td>
-                <strong style="{% if a.status != 'PENDENTE' %} text-decoration: line-through; opacity: .6;{% endif %}">{{ a.servico.nome }}</strong>
+                <strong style="{% if a.status != 'PENDENTE' %} text-decoration: line-through; opacity: .6;{% endif %}">{{ a.servico.nome }}</strong><br />
                 <span>{{ a.servico.descricao|default:'Serviço profissional' }} • {{ a.servico.duracao|default:'60' }} min</span>
               </td>
               <td class="barber">
                 {% if a.barbeiro.foto %}
-                  <img src="{{ a.barbeiro.foto.url }}" alt="Foto do Barbeiro" class="avatar" />
-                {% elif a.barbeiro.user.profile.foto %}
-                  <img src="{{ a.barbeiro.user.profile.foto.url }}" alt="Foto do Barbeiro" class="avatar" />
+                  <img src="{{ a.barbeiro.foto.url }}" class="avatar" />
                 {% else %}
                   <div class="avatar-placeholder"></div>
                 {% endif %}
-                <a href="{% url 'perfil_barbeiro' a.barbeiro.id %}" class="profile-barber">{{ a.barbeiro.user.first_name }} {{ a.barbeiro.user.last_name }}</a>
+                {{ a.barbeiro.user.first_name }}
               </td>
               <td>
-                <strong>{{ a.data|date:'d \\d\\e M, Y' }}</strong>
+                <strong>{{ a.data|date:'d/m/Y' }}</strong><br />
                 <span class="hour">{{ a.horario }}</span>
               </td>
               <td>
@@ -136,9 +129,9 @@
               </td>
               <td>
                 {% if a.status == 'PENDENTE' %}
-                  <form method="POST" action="{% url 'cancelar_agendamento' a.id %}" style="display:inline;">
+                  <form method="POST" action="{% url 'cancelar_agendamento' a.id %}">
                     {% csrf_token %}
-                    <button type="submit" class="btn-cancel" onclick="return confirm('Tem certeza?')">CANCELAR</button>
+                    <button type="submit" class="btn-cancel">CANCELAR</button>
                   </form>
                 {% else %}
                   —
@@ -148,18 +141,14 @@
           {% endfor %}
         {% else %}
           <tr>
-            <td colspan="5" style="text-align:center; padding: 30px;">Nenhum agendamento encontrado.</td>
+            <td colspan="5" style="text-align:center; padding: 30px;">Nenhum registro para este filtro.</td>
           </tr>
         {% endif %}
       </tbody>
     </table>
 
     <div class="table-footer">
-      <p>
-        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
-          <path d="m40-120 440-760 440 760H40Zm138-80h604L480-720 178-200Zm330.5-51.5Q520-263 520-280t-11.5-28.5Q497-320 480-320t-28.5 11.5Q440-297 440-280t11.5 28.5Q463-240 480-240t28.5-11.5ZM440-360h80v-200h-80v200Zm40-100Z" />
-        </svg>Os cancelamentos devem ser realizados com pelo menos 2 horas de antecedência.
-      </p>
+      <p>⚠️ Cancelamentos com 2h de antecedência mínima.</p>
     </div>
   </div>
 {% endblock %}
