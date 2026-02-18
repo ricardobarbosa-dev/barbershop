@@ -387,7 +387,6 @@ def remover_pacote(request, pk):
     return redirect('gerenciar_pacotes')
 
 def perfil_barbeiro(request, user_id):
-    # Pública para todos verem as avaliações do barbeiro
     barbeiro_user = get_object_or_404(User, id=user_id)
     avaliacoes = Avaliacao.objects.filter(barbeiro=barbeiro_user)
     media = avaliacoes.aggregate(media=Avg('nota'))['media'] or 0
