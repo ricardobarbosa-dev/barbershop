@@ -177,7 +177,7 @@ def agenda_barbeiro(request):
     barbeiro_perfil = get_object_or_404(Barbeiro, user=request.user)
     data_str = request.GET.get('data')
     data_filtro = datetime.strptime(data_str, '%Y-%m-%d').date() if data_str else timezone.localdate()
-
+    
     agendamentos = Agendamento.objects.filter(
         barbeiro=barbeiro_perfil, 
         data=data_filtro
@@ -271,8 +271,21 @@ def bloquear_agenda(request):
 def remover_bloqueio(request, pk):
     agendamento = get_object_or_404(Agendamento, pk=pk)
     data = agendamento.data
-    agendamento.delete()
-    messages.success(request, "Horário liberado!")
+    
+    if agendamento.E_BLOQUEIO:
+        bloqueios_do_bloco = Agendamento.objects.filter(
+            barbeiro=agendamento.barbeiro,
+            data=data,
+            E_BLOQUEIO=True,
+            OBSERVACAO=agendamento.OBSERVACAO
+        )
+        contagem = bloqueios_do_bloco.count()
+        bloqueios_do_bloco.delete()
+        messages.success(request, f"Período de {agendamento.OBSERVACAO} liberado!")
+    else:
+        agendamento.delete()
+        messages.success(request, "Horário liberado!")
+
     url = reverse('minha_agenda_barbeiro')
     return redirect(f"{url}?data={data}")
 
