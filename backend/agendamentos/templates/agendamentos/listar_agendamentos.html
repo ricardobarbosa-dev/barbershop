@@ -9,27 +9,20 @@
 {% endblock %}
 
 {% block content %}
-  <div class="appointments">
-    <h3>
-      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
-        <path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z" />
-      </svg>Meus Agendamentos
-    </h3>
+  <div class="card-mobile">
+    <div class="appointments">
+      <h3>Meus Agendamentos</h3>
+    </div>
 
-    <div class="filtro-agendamentos" style="margin: 20px 0; display: flex; flex-wrap: wrap; gap: 10px;">
+    <div class="filtro-agendamentos" style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
       <a href="?status=PENDENTE" class="filtro-btn {% if status_atual == 'PENDENTE' %}ativo{% endif %}">Pendentes <span>{{ total_pendentes }}</span></a>
       <a href="?status=CONCLUIDO" class="filtro-btn {% if status_atual == 'CONCLUIDO' %}ativo{% endif %}">Concluídos <span>{{ total_concluidos }}</span></a>
       <a href="?status=CANCELADO" class="filtro-btn {% if status_atual == 'CANCELADO' %}ativo{% endif %}">Cancelados <span>{{ total_cancelados }}</span></a>
-      {% if status_atual %}
-        <a href="?" class="filtro-btn" style="background: #444; color: #fff; text-decoration: none; padding: 5px 15px; border-radius: 5px;">Ver Todos</a>
-      {% endif %}
     </div>
-  </div>
 
-  <div class="card-mobile">
     {% if agendamentos %}
       {% for a in agendamentos %}
-        <section class="card-item {% if a.status != 'PENDENTE' %}disabled{% endif %}" style="margin-bottom: 15px; border: 1px solid #333; padding: 15px; border-radius: 8px;">
+        <section class="card-item {% if a.status != 'PENDENTE' %}disabled{% endif %}">
           <div class="card-header">
             <div class="info-service">
               <h3 style="{% if a.status != 'PENDENTE' %} text-decoration: line-through; opacity: .6;{% endif %}">{{ a.servico.nome }}</h3>
@@ -50,7 +43,7 @@
 
           <div class="card-details">
             <div class="barber-info">
-              <img src="https://cdn-icons-png.flaticon.com/512/219/219983.png" alt="Barbeiro" style="width: 40px; border-radius: 50%;" />
+              <img src="https://cdn-icons-png.flaticon.com/512/219/219983.png" alt="Barbeiro" />
               <div>
                 <span>BARBEIRO</span>
                 <h4>{{ a.barbeiro.nome }}</h4>
@@ -64,28 +57,38 @@
             </div>
           </div>
 
-          <div class="card-actions" style="margin-top: 10px;">
+          <div class="card-actions">
             {% if a.status == 'PENDENTE' %}
               <form method="POST" action="{% url 'cancelar_agendamento' a.id %}">
                 {% csrf_token %}
                 <button type="submit" class="btn-cancel" onclick="return confirm('Tem certeza?')">CANCELAR</button>
               </form>
-            {% else %}
-              —
             {% endif %}
           </div>
         </section>
       {% endfor %}
     {% else %}
-      <p style="text-align:center; padding:20px;">Nenhum agendamento encontrado.</p>
+      <p style="text-align:center; color: #fff;">Nenhum agendamento encontrado.</p>
     {% endif %}
   </div>
 
   <div class="table-container">
-    <div class="table-header">
-      <h2>Listagem Detalhada</h2>
-      <button class="btn-export">EXPORTAR PDF</button>
+    <div class="table-header" style="flex-direction: column; align-items: flex-start; gap: 20px;">
+      <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+        <h2>Listagem Detalhada</h2>
+        <button class="btn-export">EXPORTAR PDF</button>
+      </div>
+
+      <div class="filtro-agendamentos" style="display: flex; gap: 10px; margin-bottom: 10px;">
+        <a href="?status=PENDENTE" class="filtro-btn {% if status_atual == 'PENDENTE' %}ativo{% endif %}">Pendentes <span>{{ total_pendentes }}</span></a>
+        <a href="?status=CONCLUIDO" class="filtro-btn {% if status_atual == 'CONCLUIDO' %}ativo{% endif %}">Concluídos <span>{{ total_concluidos }}</span></a>
+        <a href="?status=CANCELADO" class="filtro-btn {% if status_atual == 'CANCELADO' %}ativo{% endif %}">Cancelados <span>{{ total_cancelados }}</span></a>
+        {% if status_atual %}
+          <a href="?" class="filtro-btn" style="background: #444;">Limpar Filtro</a>
+        {% endif %}
+      </div>
     </div>
+
     <table class="appointments-table">
       <thead>
         <tr>
@@ -104,14 +107,7 @@
                 <strong style="{% if a.status != 'PENDENTE' %} text-decoration: line-through; opacity: .6;{% endif %}">{{ a.servico.nome }}</strong><br />
                 <span>{{ a.servico.descricao|default:'Serviço profissional' }} • {{ a.servico.duracao|default:'60' }} min</span>
               </td>
-              <td class="barber">
-                {% if a.barbeiro.foto %}
-                  <img src="{{ a.barbeiro.foto.url }}" class="avatar" />
-                {% else %}
-                  <div class="avatar-placeholder"></div>
-                {% endif %}
-                {{ a.barbeiro.user.first_name }}
-              </td>
+              <td class="barber">{{ a.barbeiro.nome }}</td>
               <td>
                 <strong>{{ a.data|date:'d/m/Y' }}</strong><br />
                 <span class="hour">{{ a.horario }}</span>
@@ -141,7 +137,7 @@
           {% endfor %}
         {% else %}
           <tr>
-            <td colspan="5" style="text-align:center; padding: 30px;">Nenhum registro para este filtro.</td>
+            <td colspan="5" style="text-align:center; padding: 40px; color: #fff;">Nenhum registro encontrado para este filtro.</td>
           </tr>
         {% endif %}
       </tbody>
