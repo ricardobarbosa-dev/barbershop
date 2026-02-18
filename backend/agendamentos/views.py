@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import datetime, timedelta
 from django.urls import reverse
+import json
 # models
 from .models import Agendamento, NivelFidelidade, PacoteCorte, Avaliacao, DisponibilidadeBarbeiro, BloqueioAgenda
 from servicos.models import Servico
@@ -92,6 +93,18 @@ def criar_agendamento(request):
     servicos = Servico.objects.all()
     barbeiros = Barbeiro.objects.filter(ativo=True)
 
+    # LÓGICA PARA DATAS LOTADAS
+    # Aqui contamos quantos agendamentos existem por data (excluindo os cancelados)
+    # Agrupamos por data e filtramos aquelas que atingiram um limite (ex: 15 atendimentos por dia no total)
+    LIMITE_AGENDAMENTOS_DIARIOS = 15 
+    agendamentos_por_dia = Agendamento.objects.exclude(status='CANCELADO') \
+        .values('data') \
+        .annotate(total=Count('id')) \
+        .filter(total__gte=LIMITE_AGENDAMENTOS_DIARIOS)
+
+    # Criamos uma lista de strings no formato 'YYYY-MM-DD' para o JavaScript
+    datas_lotadas = [item['data'].strftime('%Y-%m-%d') for item in agendamentos_por_dia]
+
     if request.method == 'POST':
         servico_id = request.POST.get('servico')
         barbeiro_id = request.POST.get('barbeiro')
@@ -101,11 +114,13 @@ def criar_agendamento(request):
         if not all([servico_id, barbeiro_id, data, horario]):
             messages.error(request, 'Por favor, preencha todos os campos.')
             return redirect('criar_agendamento')
+
+        # Verifica se o horário específico já existe para aquele barbeiro
         existe = Agendamento.objects.filter(
             barbeiro_id=barbeiro_id,
             data=data,
             horario=horario
-        ).exclude(status='CANCELADO').exists() 
+        ).exclude(status='CANCELADO').exists()
 
         if existe:
             messages.error(request, 'Este horário já está ocupado. Escolha outro.')
@@ -118,7 +133,7 @@ def criar_agendamento(request):
                 barbeiro_id=barbeiro_id,
                 data=data,
                 horario=horario,
-                status='PENDENTE' 
+                status='PENDENTE'
             )
             messages.success(request, 'Agendamento criado com sucesso!')
             return redirect('listar_agendamentos')
@@ -128,9 +143,10 @@ def criar_agendamento(request):
 
     return render(request, 'agendamentos/criar_agendamento.html', {
         'servicos': servicos,
-        'barbeiros': barbeiros
+        'barbeiros': barbeiros,
+        'datas_lotadas_json': json.dumps(datas_lotadas)  # Enviando para o template
     })
-
+    
 @login_required
 def cancelar_agendamento(request, agendamento_id):
     agendamento = get_object_or_404(Agendamento, id=agendamento_id, cliente=request.user)

@@ -837,6 +837,7 @@ footer {
     font-size: 0.7rem;
     color: var(--text-second);
     margin-bottom: 2rem;
+    margin-top: 5rem;
 }
 
 .slots-grid {

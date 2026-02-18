@@ -379,6 +379,60 @@
     margin-top: 1.2rem;
 }
 
+.flatpickr-calendar {
+    background: linear-gradient(145deg, #121212, #080808) !important;
+    border: 1px solid #333 !important;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5) !important;
+}
+
+.flatpickr-month,
+.flatpickr-current-month,
+.flatpickr-monthDropdown-months {
+    background: #1a1a1a !important;
+    color: #fff !important;
+    fill: #fff !important;
+}
+
+span.flatpickr-weekday {
+    background: #1a1a1a !important;
+    color: #ffcc00 !important;
+    font-weight: bold;
+}
+
+.flatpickr-day {
+    color: #eee !important;
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.selected:hover {
+    background: #ffcc00 !important;
+    border-color: #ffcc00 !important;
+    color: #000 !important;
+    font-weight: bold;
+}
+
+.flatpickr-day:hover {
+    background: #333 !important;
+    color: #fff !important;
+}
+
+.flatpickr-day.prevMonthDay,
+.flatpickr-day.nextMonthDay {
+    color: #444 !important;
+}
+
+.flatpickr-day.flatpickr-disabled,
+.flatpickr-day.flatpickr-disabled:hover {
+    color: #333 !important;
+    background: transparent !important;
+    cursor: not-allowed !important;
+}
+
+.flatpickr-prev-month svg,
+.flatpickr-next-month svg {
+    fill: #ffcc00 !important;
+}
+
 .btn-bloquear {
     background: linear-gradient(135deg, #ff4d4d, #b30000);
     color: var(--text-color);

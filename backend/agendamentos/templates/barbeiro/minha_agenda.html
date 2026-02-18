@@ -81,7 +81,6 @@
               <span class="section-label">RESTANTE DO DIA</span>
             {% endif %}
           {% else %}
-            {# ITENS DA LISTA ABAIXO DO PRÓXIMO HORÁRIO #}
             <div class="timeline-item">
               <div class="timeline-time">{{ agendamento.horario|time:'H:i' }}</div>
               <div class="timeline-card {% if agendamento.E_BLOQUEIO %}bloqueio-linha{% endif %}">
@@ -103,7 +102,7 @@
                       {{ agendamento.OBSERVACAO|upper|default:'BLOQUEADO' }}
                       <small style="display:block; font-size: 10px; color: #888;">INÍCIO DO BLOQUEIO</small>
                     {% else %}
-                      {{ agendamento.cliente.get_full_name|default:agendamento.cliente.username }}
+                      {{ agendamento.cliente.get_full_name|default:agendamento.cliente.first_name }}
                     {% endif %}
                   </h4>
                   <p class="text-truncate">
@@ -129,15 +128,12 @@
             </div>
           {% endif %}
         {% else %}
-          {# Se o agendamento for um bloqueio repetido e não for cliente, não renderizamos nada (limpa o loop) #}
           {% if not agendamento.E_BLOQUEIO %}
-            {# Se por algum motivo cair aqui e não for bloqueio, renderiza normal para não perder dados #}
             <div class="timeline-item">
               <div class="timeline-time">{{ agendamento.horario|time:'H:i' }}</div>
               <div class="timeline-card">
-                {# ... conteúdo simplificado para segurança ... #}
                 <div class="user-info-agenda">
-                  <h4>{{ agendamento.cliente.username }}</h4>
+                  <h4>{{ agendamento.cliente.get_full_name|default:agendamento.cliente.first_name }}</h4>
                 </div>
               </div>
             </div>
