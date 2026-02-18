@@ -2,6 +2,7 @@ from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
 from .views import perfil_cliente
+from .views import listar_agendamentos
 
 urlpatterns = [
     path('login/', views.login_view, name='login'),
@@ -17,7 +18,7 @@ urlpatterns = [
     path('historico/', views.historico_cliente, name='historico_cliente'),
     # path('editar-perfil/', views.editar_perfil_barbeiro, name='editar_perfil_barbeiro'),
     path('perfil/editar/', views.editar_perfil_barbeiro, name='editar_perfil_barbeiro'),
-    path('redirect/', views.redirect_dashboard, name='redirect_dashboard'),
+    path('redirect/', views.redirect_dashboard, name='redirect_dashboard'), 
 ]
 
 
