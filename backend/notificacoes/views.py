@@ -8,7 +8,6 @@ from django.shortcuts import get_object_or_404
 
 @login_required
 def listar_notificacoes(request):
-
     notificacoes = Notificacao.objects.filter(
         usuario=request.user,
         lida=False
@@ -18,11 +17,11 @@ def listar_notificacoes(request):
         {
             "id": n.id,
             "mensagem": n.mensagem,
+            "tipo": n.tipo, 
             "criada": n.criada_em.strftime("%H:%M")
         }
         for n in notificacoes
     ]
-
     return JsonResponse(data, safe=False)
 
 @login_required
@@ -48,4 +47,4 @@ def marcar_como_lida(request, id):
 @require_POST
 def ler_todas_notificacoes(request):
     Notificacao.objects.filter(usuario=request.user, lida=False).update(lida=True)
-    return JsonResponse({'success': True})
+    return JsonResponse({'success': True}) 

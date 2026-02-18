@@ -154,6 +154,11 @@ def cancelar_agendamento(request, agendamento_id):
         if agendamento.status == 'PENDENTE':
             agendamento.status = 'CANCELADO'
             agendamento.save()
+            Notificacao.objects.create(
+            usuario=agendamento.cliente, # Notifica o cliente
+            mensagem=f"Seu agendamento para o dia {agendamento.data.strftime('%d/%m')} foi cancelado.",
+            tipo='CANCELADO'
+        )
             messages.success(request, 'Agendamento cancelado!')
         else:
             messages.error(request, 'Este agendamento não pode ser cancelado.')

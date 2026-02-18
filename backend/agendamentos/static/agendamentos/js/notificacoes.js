@@ -27,20 +27,38 @@ async function carregarNotificacoes() {
         }
 
         let html = `
-            <div class="notificacao-header" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #444;">
-                <span style="font-weight: bold; font-size: 13px;">Notificações</span>
+            <div class="notificacao-header" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #444; background: #1a1a1a;">
+                <span style="font-weight: bold; font-size: 13px; color: #fff;">Notificações</span>
                 <button id="marcar-todas-lidas" style="background: none; border: none; color: #ffcc00; cursor: pointer; font-size: 11px; text-decoration: underline;">
                     Marcar todas como lida
                 </button>
             </div>
-            <div class="lista-notificacoes">
+            <div class="lista-notificacoes" style="max-height: 300px; overflow-y: auto;">
         `;
 
         data.forEach(n => {
+            // Define a cor da borda esquerda baseada no tipo da notificação
+            let corDestaque = '#ffcc00'; // Padrão (Amarelo)
+            let icone = '🔔';
+
+            if (n.tipo === 'CANCELADO') {
+                corDestaque = '#e74c3c'; // Vermelho para cancelamento
+                icone = '❌';
+            } else if (n.tipo === 'CONCLUIDO') {
+                corDestaque = '#2ecc71'; // Verde para concluído
+                icone = '✅';
+            }
+
             html += `
-                <div class="notificacao-item" data-id="${n.id}" style="padding: 10px; border-bottom: 1px solid #333; cursor: pointer;">
-                    <div style="font-size: 14px;">${n.mensagem}</div>
-                    <small style="color: #666; font-size: 11px;">${n.criada}</small>
+                <div class="notificacao-item" data-id="${n.id}" 
+                     style="padding: 12px; border-bottom: 1px solid #333; cursor: pointer; border-left: 4px solid ${corDestaque}; transition: background 0.3s;">
+                    <div style="display: flex; align-items: flex-start; gap: 8px;">
+                        <span>${icone}</span>
+                        <div>
+                            <div style="font-size: 13px; color: #eee; line-height: 1.4;">${n.mensagem}</div>
+                            <small style="color: #666; font-size: 10px;">${n.criada}</small>
+                        </div>
+                    </div>
                 </div>
             `;
         });
@@ -131,17 +149,19 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
 if (badge) {
     setInterval(carregarNotificacoes, 20000);
     carregarNotificacoes();
 }
 
-// dropdown 
+// dropdown sistema (ações da tabela)
 function toggleDropdown(id) {
     document.querySelectorAll('.dropdown-content').forEach(d => {
         if (d.id !== 'dropdown-' + id) d.classList.remove('show');
     });
-    document.getElementById('dropdown-' + id).classList.toggle('show');
+    const el = document.getElementById('dropdown-' + id);
+    if (el) el.classList.toggle('show');
 }
 
 window.onclick = function (event) {
@@ -150,8 +170,7 @@ window.onclick = function (event) {
     }
 }
 
-
-// 
+// SweetAlert2 para Confirmação de Ações (Ex: Cancelar)
 document.addEventListener('DOMContentLoaded', function () {
     const botoesConfirmacao = document.querySelectorAll('.btn-confirmar-acao');
 
