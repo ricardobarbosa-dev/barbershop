@@ -16,21 +16,13 @@
 
   <div class="appointments">
     <h3>Histórico</h3>
-
-    <div class="filtro-agendamentos" style="margin-top: 20px;">
-      <a href="?status=PENDENTE" class="filtro-btn {% if status_atual == 'PENDENTE' %}ativo{% endif %}">Pendentes <span>{{ total_pendentes }}</span></a>
-      <a href="?status=CONCLUIDO" class="filtro-btn {% if status_atual == 'CONCLUIDO' %}ativo{% endif %}">Concluídos <span>{{ total_concluidos }}</span></a>
-      <a href="?status=CANCELADO" class="filtro-btn {% if status_atual == 'CANCELADO' %}ativo{% endif %}">Cancelados <span>{{ total_cancelados }}</span></a>
-      {% if status_atual %}
-        <a href="?" class="filtro-btn" style="background: #333;">Limpar Filtro</a>
-      {% endif %}
-    </div>
   </div>
 
+  <!-- MOBILE -->
   <div class="card-mobile">
     {% if page_obj %}
       {% for a in page_obj %}
-        <section id="card-{{ a.id }}" class="{% if a.status != 'PENDENTE' %}disabled{% endif %}">
+        <section id="card" class="{% if a.status != 'PENDENTE' %}disabled{% endif %}">
           <div class="card-header">
             <div class="info-service">
               <h3 style="{% if a.status != 'PENDENTE' %}text-decoration: line-through; opacity:.6;{% endif %}">{{ a.servico.nome }}</h3>
@@ -39,9 +31,9 @@
 
             <strong class="status-{{ a.status|lower }} status">
               {% if a.status == 'PENDENTE' %}
-                 AGENDADO
+                AGENDADO
               {% elif a.status == 'CONCLUIDO' %}
-                 CONCLUÍDO
+                CONCLUÍDO
               {% else %}
                 CANCELADO
               {% endif %}
@@ -85,12 +77,13 @@
         </section>
       {% endfor %}
     {% else %}
-      <section class="principal">
-        <p>Nenhum agendamento encontrado para este filtro.</p>
+      <section id="card" class="principal">
+        <p>Você não possui nenhum histórico de agendamento.</p>
       </section>
     {% endif %}
   </div>
 
+  <!-- DESKTOP -->
   <div class="table-container">
     <div class="table-header">
       <h2>Histórico de Cortes</h2>
@@ -125,7 +118,7 @@
                 {% else %}
                   <div class="avatar-placeholder"></div>
                 {% endif %}
-                <a href="{% url 'perfil_barbeiro' a.barbeiro.id %}" class="profile-barber">{{ a.barbeiro.user.first_name }} {{ a.barbeiro.user.last_name }}</a>
+                {{ a.barbeiro.user.first_name }} {{ a.barbeiro.user.last_name }}
               </td>
 
               <td>
@@ -136,9 +129,9 @@
               <td>
                 <span class="status status-{{ a.status|lower }}">
                   {% if a.status == 'PENDENTE' %}
-                     AGENDADO
+                    AGENDADO
                   {% elif a.status == 'CONCLUIDO' %}
-                     CONCLUÍDO
+                    CONCLUÍDO
                   {% else %}
                     CANCELADO
                   {% endif %}
@@ -147,7 +140,7 @@
 
               <td>
                 {% if a.status == 'PENDENTE' %}
-                  <form method="POST" action="{% url 'cancelar_agendamento' a.id %}" style="display:inline;">
+                  <form method="POST" action="{% url 'cancelar_agendamento' a.id %}">
                     {% csrf_token %}
                     <button type="submit" class="btn-cancel" onclick="return confirm('Tem certeza?')">CANCELAR</button>
                   </form>
@@ -159,7 +152,7 @@
           {% endfor %}
         {% else %}
           <tr>
-            <td colspan="5" style="text-align:center; padding:30px; color: #888888;">Nenhum registro encontrado.</td>
+            <td colspan="5" style="text-align:center; padding:30px; color: #888888;">Você ainda não possui histórico.</td>
           </tr>
         {% endif %}
       </tbody>
@@ -174,33 +167,195 @@
 
       <div class="pagination">
         {% if page_obj.has_previous %}
-          <a href="?page={{ page_obj.previous_page_number }}{% if status_atual %}
-              &status={{ status_atual }}
-            {% endif %}">
-            ‹
-          </a>
+          <a href="?page={{ page_obj.previous_page_number }}">‹</a>
         {% endif %}
 
         {% for num in page_obj.paginator.page_range %}
           {% if page_obj.number == num %}
             <span class="current">{{ num }}</span>
           {% else %}
-            <a href="?page={{ num }}{% if status_atual %}
-                &status={{ status_atual }}
-              {% endif %}">
-              {{ num }}
-            </a>
+            <a href="?page={{ num }}">{{ num }}</a>
           {% endif %}
         {% endfor %}
 
         {% if page_obj.has_next %}
-          <a href="?page={{ page_obj.next_page_number }}{% if status_atual %}
-              &status={{ status_atual }}
-            {% endif %}">
-            >
-          </a>
+          <a href="?page={{ page_obj.next_page_number }}&status={{ status_atual }}">></a>
         {% endif %}
       </div>
+    </div>
+  </div>
+
+  <div class="appointments">
+    <h3>Agendamentos</h3>
+  </div>
+  <div class="card-mobile">
+    {% if agendamentos %}
+      {% for a in agendamentos %}
+        <section id="card" class="{% if a.status != 'PENDENTE' %}disabled{% endif %}">
+          <div class="card-header">
+            <div class="info-service">
+              <h3 style="{% if a.status != 'PENDENTE' %} text-decoration: line-through; opacity: .6;{% endif %}">{{ a.servico.nome }}</h3>
+              <p style="{% if a.status != 'PENDENTE' %}text-decoration: line-through; opacity:.6;{% endif %}">{{ a.servico.descricao|default:'Serviço profissional' }} • {{ a.servico.duracao|default:'60' }} min</p>
+            </div>
+            <div class="info-status">
+              <strong class="status-{{ a.status|lower }}">
+                {% if a.status == 'PENDENTE' %}
+                  AGENDADO
+                {% elif a.status == 'CONCLUIDO' %}
+                  CONCLUÍDO
+                {% else %}
+                  CANCELADO
+                {% endif %}
+              </strong>
+            </div>
+          </div>
+
+          <div class="card-details">
+            <div class="barber-info">
+              <img src="https://cdn-icons-png.flaticon.com/512/219/219983.png" alt="Barbeiro" />
+              <div>
+                <span>BARBEIRO</span>
+                <h4>{{ a.barbeiro.nome }}</h4>
+              </div>
+            </div>
+            <div class="date-info">
+              <div class="icon-clock">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                  <path d="M582-298 440-440v-200h80v167l118 118-56 57ZM440-720v-80h80v80h-80Zm280 280v-80h80v80h-80ZM440-160v-80h80v80h-80ZM160-440v-80h80v80h-80ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" />
+                </svg>
+              </div>
+              <div>
+                <span>DATA/HORA</span>
+                <h4>{{ a.data|date:'d M' }} • {{ a.horario }}</h4>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-actions">
+            {% if a.status == 'PENDENTE' %}
+              <form method="POST" action="{% url 'cancelar_agendamento' a.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn-cancel" onclick="return confirm('Tem certeza que deseja cancelar este agendamento?')">CANCELAR</button>
+              </form>
+            {% else %}
+              —
+            {% endif %}
+          </div>
+          <!-- filtro agendamentos -->
+          <div class="filtro-agendamentos">
+            <a href="?status=PENDENTE" class="filtro-btn {% if status_atual == 'PENDENTE' %}ativo{% endif %}">
+              Pendentes
+              <span>{{ total_pendentes }}</span>
+            </a>
+            <a href="?status=CONCLUIDO" class="filtro-btn {% if status_atual == 'CONCLUIDO' %}ativo{% endif %}">
+              Concluídos
+              <span>{{ total_concluidos }}</span>
+            </a>
+            <a href="?status=CANCELADO" class="filtro-btn {% if status_atual == 'CANCELADO' %}ativo{% endif %}">
+              Cancelados
+              <span>{{ total_cancelados }}</span>
+            </a>
+          </div>
+          <!-- fim filtro -->
+        </section>
+      {% endfor %}
+    {% else %}
+      <section id="card" class="principal">
+        <p>Você não possui nenhum histórico de agendamento.</p>
+      </section>
+    {% endif %}
+  </div>
+
+  <div class="table-container">
+    <div class="table-header">
+      <h3>Meus Agendamentos</h3>
+      <button class="btn-export">EXPORTAR PDF</button>
+    </div>
+    <table class="appointments-table">
+      <thead>
+        <tr>
+          <th>SERVIÇO</th>
+          <th>PROFISSIONAL</th>
+          <th>DATA & HORÁRIO</th>
+          <th>STATUS</th>
+          <th>AÇÕES</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if agendamentos %}
+          {% for a in agendamentos %}
+            <tr class="{% if a.status != 'PENDENTE' %}disabled{% endif %}">
+              <td>
+                <strong style="{% if a.status != 'PENDENTE' %} text-decoration: line-through; opacity: .6;{% endif %}">{{ a.servico.nome }}</strong>
+                <span>{{ a.servico.descricao|default:'Serviço profissional' }} • {{ a.servico.duracao|default:'60' }} min</span>
+              </td>
+              <td class="barber">
+                {% if a.barbeiro.foto %}
+                  <img src="{{ a.barbeiro.foto.url }}" alt="Foto do Barbeiro" class="avatar" />
+                {% elif a.barbeiro.user.profile.foto %}
+                  <img src="{{ a.barbeiro.user.profile.foto.url }}" alt="Foto do Barbeiro" class="avatar" />
+                {% else %}
+                  <div class="avatar-placeholder"></div>
+                {% endif %}
+                <a href="{% url 'perfil_barbeiro' a.barbeiro.id %}" class="profile-barber">{{ a.barbeiro.user.first_name }} {{ a.barbeiro.user.last_name }}</a>
+              </td>
+              <td>
+                <strong>{{ a.data|date:'d \\d\\e M, Y' }}</strong>
+                <span class="hour">{{ a.horario }}</span>
+              </td>
+              <td>
+                <span class="status status-{{ a.status|lower }}">
+                  {% if a.status == 'PENDENTE' %}
+                    AGENDADO
+                  {% elif a.status == 'CONCLUIDO' %}
+                    CONCLUÍDO
+                  {% else %}
+                    CANCELADO
+                  {% endif %}
+                </span>
+              </td>
+              <td>
+                {% if a.status == 'PENDENTE' %}
+                  <form method="POST" action="{% url 'cancelar_agendamento' a.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-cancel" onclick="return confirm('Tem certeza que deseja cancelar este agendamento?')">CANCELAR</button>
+                  </form>
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="5" style="text-align:center; padding: 30px; color: #888888;">Você não possui agendamentos.</td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+
+    <div class="table-footer">
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+          <path d="m40-120 440-760 440 760H40Zm138-80h604L480-720 178-200Zm330.5-51.5Q520-263 520-280t-11.5-28.5Q497-320 480-320t-28.5 11.5Q440-297 440-280t11.5 28.5Q463-240 480-240t28.5-11.5ZM440-360h80v-200h-80v200Zm40-100Z" />
+        </svg>Os cancelamentos devem ser realizados com pelo menos 2 horas de antecedência.
+      </p>
+      <!-- filtro agendamentos -->
+      <div class="filtro-agendamentos">
+        <a href="?status=PENDENTE" class="filtro-btn {% if status_atual == 'PENDENTE' %}ativo{% endif %}">
+          Pendentes
+          <span>{{ total_pendentes }}</span>
+        </a>
+        <a href="?status=CONCLUIDO" class="filtro-btn {% if status_atual == 'CONCLUIDO' %}ativo{% endif %}">
+          Concluídos
+          <span>{{ total_concluidos }}</span>
+        </a>
+        <a href="?status=CANCELADO" class="filtro-btn {% if status_atual == 'CANCELADO' %}ativo{% endif %}">
+          Cancelados
+          <span>{{ total_cancelados }}</span>
+        </a>
+      </div>
+      <!-- fim filtro -->
     </div>
   </div>
 {% endblock %}
