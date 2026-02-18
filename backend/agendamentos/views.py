@@ -214,7 +214,7 @@ def concluir_agendamento(request, agendamento_id):
         agendamento.save()
         messages.success(request, "Atendimento concluído com sucesso!")
 
-    return redirect('agenda_barbeiro')
+    return redirect('minha_agenda_barbeiro')
 
 @user_passes_test(e_staff)
 def gerenciar_pacotes(request):
@@ -234,7 +234,7 @@ def atualizar_status_agendamento(request, agendamento_id, status):
     agendamento.save()
     messages.success(request, f"Status alterado!")
     
-    url = reverse('agenda_barbeiro')
+    url = reverse('minha_agenda_barbeiro')
     return redirect(f"{url}?data={agendamento.data}")
 
 # ==========================================
@@ -258,7 +258,7 @@ def bloquear_agenda(request):
         )
 
         messages.success(request, 'Período bloqueado com sucesso!')
-        url = reverse('agenda_barbeiro')
+        url = reverse('minha_agenda_barbeiro')
         return redirect(f"{url}?data={data}")
 
 @user_passes_test(e_staff)
@@ -268,7 +268,7 @@ def remover_bloqueio(request, pk):
     bloqueio.delete()
 
     messages.success(request, "Bloqueio removido com sucesso!")
-    url = reverse('agenda_barbeiro')
+    url = reverse('minha_agenda_barbeiro')
     return redirect(f"{url}?data={data}")
 
 # ==========================================
