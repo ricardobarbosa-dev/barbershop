@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-  Dashboard Barbeiro | Agendamento
+  Dashboard Barbeiro | Agendamentos
 {% endblock %}
 
 {% block breadcrumb %}
@@ -17,8 +17,9 @@
   <div class="container-card">
     <header class="header-text">
       <h1>AGENDA<span>MENTOS</span></h1>
-      <p>Veja seus agendamentos, bloqueio de horários.</p>
+      <p>Gestão e Histórico de atendimentos do dia.</p>
     </header>
+
     <section id="card" class="principal" style="padding: 1rem;">
       <header class="agenda-header">
         <div class="tabs-agenda" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
@@ -35,120 +36,100 @@
       </header>
 
       <div class="agenda-content">
+        {# --- SEÇÃO 1: AGENDAMENTOS ABERTOS (PENDENTE / AGENDADO / BLOQUEIOS) --- #}
+        <span class="section-label"><i class="fas fa-clock"></i> AGENDAMENTOS EM ABERTO</span>
+
         {% for agendamento in agendamentos %}
-          {# O ifchanged verifica se o status de bloqueio ou a observação mudou. Se for igual ao anterior, ele pula #}
-          {% ifchanged agendamento.E_BLOQUEIO agendamento.OBSERVACAO %}
-
-          {% if forloop.first %}
-            <span class="section-label"><i class="fas fa-circle"></i> PRÓXIMO HORÁRIO</span>
-            <div class="card-proximo {% if agendamento.E_BLOQUEIO %}bloqueio-destaque{% endif %}">
-              <div class="card-header-info">
-                <span class="time-main">{{ agendamento.horario|time:'H:i' }}</span>
-              </div>
-
-              <div class="client-details">
-                {% if agendamento.E_BLOQUEIO %}
-                  <h3 style="color: #e74c3c;"><i class="fas fa-lock"></i> {{ agendamento.OBSERVACAO|upper|default:'INDISPONÍVEL' }}</h3>
-                  <p>Este período foi bloqueado. Clique abaixo para liberar o início deste horário.</p>
-                {% else %}
-                  <h3>{{ agendamento.cliente.get_full_name|default:agendamento.cliente.username }}</h3>
-                  <p>
-                    <i class="fas fa-cut"></i> {{ agendamento.servico.nome }}
-                  </p>
-                {% endif %}
-              </div>
-
-              <div class="card-footer-actions">
-                {% if agendamento.E_BLOQUEIO %}
-                  <a href="{% url 'remover_bloqueio' agendamento.id %}" class="btn-primary-agenda btn-confirmar-acao" data-titulo="Liberar Horário?" data-texto="Deseja remover este bloqueio?" data-icon="question">LIBERAR HORÁRIO</a>
-                {% else %}
-                  {% if agendamento.status == 'PENDENTE' %}
-                    <a href="{% url 'atualizar_status_agendamento' agendamento.id 'AGENDADO' %}" class="btn-primary-agenda">CONFIRMAR</a>
-                  {% elif agendamento.status == 'AGENDADO' %}
-                    <a href="{% url 'concluir_agendamento' agendamento.id %}" class="btn-primary-agenda"><i class="fas fa-play"></i> INICIAR</a>
-                  {% else %}
-                    <span class="status-finalizado badge-{{ agendamento.status|lower }}">{{ agendamento.get_status_display|upper }}</span>
-                  {% endif %}
-
-                  {% if agendamento.status in 'PENDENTE,AGENDADO' %}
-                    <a href="{% url 'atualizar_status_agendamento' agendamento.id 'CANCELADO' %}" class="btn-cancelar-x btn-confirmar-acao" data-titulo="Cancelar?" data-icon="warning"><i class="fas fa-times"></i></a>
-                  {% endif %}
-                {% endif %}
-              </div>
-            </div>
-
-            {% if not forloop.last %}
-              <span class="section-label">RESTANTE DO DIA</span>
-            {% endif %}
-          {% else %}
+          {% if agendamento.status == 'PENDENTE' or agendamento.status == 'AGENDADO' or agendamento.E_BLOQUEIO %}
             <div class="timeline-item">
               <div class="timeline-time">{{ agendamento.horario|time:'H:i' }}</div>
 
-              <div class="timeline-card {% if agendamento.E_BLOQUEIO %}bloqueio-linha{% endif %}" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 15px;">
-                <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                  <div class="user-avatar">
+              <div class="timeline-card {% if agendamento.E_BLOQUEIO %}bloqueio-linha{% endif %}">
+                <div class="user-avatar">
+                  {% if agendamento.E_BLOQUEIO %}
+                    <div class="avatar-placeholder" style="color: #e74c3c;">
+                      <i class="fas fa-ban"></i>
+                    </div>
+                  {% elif agendamento.cliente.profile.foto %}
+                    <img src="{{ agendamento.cliente.profile.foto.url }}" />
+                  {% else %}
+                    <div class="avatar-placeholder">{{ agendamento.cliente.username|first|upper }}</div>
+                  {% endif %}
+                </div>
+
+                <div class="user-info-agenda">
+                  <h4 class="text-truncate">
                     {% if agendamento.E_BLOQUEIO %}
-                      <div class="avatar-placeholder" style="color: #e74c3c;">
-                        <i class="fas fa-ban"></i>
-                      </div>
-                    {% elif agendamento.cliente.profile.foto %}
-                      <img src="{{ agendamento.cliente.profile.foto.url }}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;" />
+                      {{ agendamento.OBSERVACAO|upper|default:'BLOQUEADO' }}
+                    {% else %}
+                      {{ agendamento.cliente.get_full_name|default:agendamento.cliente.username|title }}
+                    {% endif %}
+                  </h4>
+                  <p class="text-truncate">
+                    {% if agendamento.E_BLOQUEIO %}
+                      Indisponível para novos agendamentos
+                    {% else %}
+                      <i class="fas fa-cut"></i> {{ agendamento.servico.nome }}
+                    {% endif %}
+                  </p>
+                </div>
+
+                <div class="user-actions-list">
+                  {% if agendamento.E_BLOQUEIO %}
+                    <a href="{% url 'remover_bloqueio' agendamento.id %}" class="btn-action-list danger btn-confirmar-acao" data-titulo="Remover Bloqueio?"><i class="fas fa-trash"></i></a>
+                  {% else %}
+                    {# Ações para Pendentes ou Agendados #}
+                    <a href="{% url 'concluir_agendamento' agendamento.id %}" class="btn-action-list success" title="Concluir Atendimento"><i class="fas fa-check"></i></a>
+                    <a href="{% url 'atualizar_status_agendamento' agendamento.id 'CANCELADO' %}" class="btn-action-list danger btn-confirmar-acao" data-titulo="Cancelar?" data-icon="warning"><i class="fas fa-times"></i></a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+
+        <br /><br />
+
+        {# --- SEÇÃO 2: HISTÓRICO (CONCLUÍDO / CANCELADO) --- #}
+        <span class="section-label"><i class="fas fa-history"></i> HISTÓRICO (FINALIZADOS)</span>
+
+        {% for agendamento in agendamentos %}
+          {% if agendamento.status == 'CONCLUIDO' or agendamento.status == 'CANCELADO' %}
+            {% if not agendamento.E_BLOQUEIO %}
+              <div class="timeline-item" style="opacity: 0.7;">
+                <div class="timeline-time">{{ agendamento.horario|time:'H:i' }}</div>
+
+                <div class="timeline-card">
+                  <div class="user-avatar">
+                    {% if agendamento.cliente.profile.foto %}
+                      <img src="{{ agendamento.cliente.profile.foto.url }}" style="filter: grayscale(1);" />
                     {% else %}
                       <div class="avatar-placeholder">{{ agendamento.cliente.username|first|upper }}</div>
                     {% endif %}
                   </div>
 
                   <div class="user-info-agenda">
-                    <h4 style="margin: 0; font-size: 14px; color: #fff; font-weight: 600;">
-                      {% if agendamento.E_BLOQUEIO %}
-                        {{ agendamento.OBSERVACAO|upper|default:'BLOQUEADO' }}
-                      {% else %}
-                        {{ agendamento.cliente.get_full_name|default:agendamento.cliente.username|title }}
-                      {% endif %}
-                    </h4>
-                    <p style="margin: 2px 0 0; font-size: 12px; color: #ffcc00;">
-                      {% if agendamento.E_BLOQUEIO %}
-                        <small style="color: #888;">Indisponível</small>
-                      {% else %}
-                        <i class="fas fa-cut" style="font-size: 10px;"></i> {{ agendamento.servico.nome }}
-                      {% endif %}
+                    <h4 class="text-truncate" style="color: #999;">{{ agendamento.cliente.get_full_name|default:agendamento.cliente.username|title }}</h4>
+                    <p class="text-truncate">
+                      <i class="fas fa-check-double"></i> {{ agendamento.servico.nome }}
                     </p>
                   </div>
-                </div>
 
-                <div class="user-actions-list" style="display: flex; gap: 8px; align-items: center;">
-                  {% if agendamento.E_BLOQUEIO %}
-                    <a href="{% url 'remover_bloqueio' agendamento.id %}" class="btn-confirmar-acao" data-titulo="Remover Bloqueio?" style="color: #e74c3c; padding: 5px 10px; border: 1px solid #e74c3c; border-radius: 4px; font-size: 12px;"><i class="fas fa-trash-alt"></i></a>
-                  {% elif agendamento.status == 'PENDENTE' or agendamento.status == 'AGENDADO' %}
-                    <a href="{% url 'concluir_agendamento' agendamento.id %}" style="background: #27ae60; color: white; padding: 6px 12px; border-radius: 5px; font-size: 12px; text-decoration: none; font-weight: bold;"><i class="fas fa-check"></i></a>
-
-                    <a href="{% url 'atualizar_status_agendamento' agendamento.id 'CANCELADO' %}" class="btn-confirmar-acao" data-titulo="Cancelar Agendamento?" data-texto="Deseja realmente cancelar o horário de {{ agendamento.cliente.username }}?" style="background: #c0392b; color: white; padding: 6px 12px; border-radius: 5px; font-size: 12px; text-decoration: none; font-weight: bold;"><i class="fas fa-times"></i></a>
-                  {% else %}
-                    <span style="font-size: 10px; padding: 4px 8px; border-radius: 12px; background: #333; color: #aaa; border: 1px solid #444; font-weight: bold;">{{ agendamento.get_status_display|upper }}</span>
-                  {% endif %}
+                  <div class="user-actions-list">
+                    <span class="badge-status badge-{{ agendamento.status|lower }}">{{ agendamento.get_status_display|upper }}</span>
+                  </div>
                 </div>
               </div>
-            </div>
+            {% endif %}
           {% endif %}
-        {% else %}
-          {% if not agendamento.E_BLOQUEIO %}
-            <div class="timeline-item">
-              <div class="timeline-time">{{ agendamento.horario|time:'H:i' }}</div>
-              <div class="timeline-card">
-                <div class="user-info-agenda">
-                  <h4>{{ agendamento.cliente.get_full_name|default:agendamento.cliente.first_name }}</h4>
-                </div>
-              </div>
-            </div>
-          {% endif %}
-          {% endifchanged %}
+        {% endfor %}
 
-          {% empty %}
+        {% if not agendamentos %}
           <div class="empty-agenda">
             <i class="far fa-calendar-times"></i>
-            <p style="color: #ff4d4d;">Nenhum agendamento encontrado.</p>
+            <p style="color: #ff4d4d;">Nenhum agendamento encontrado para esta data.</p>
           </div>
-        {% endfor %}
+        {% endif %}
       </div>
     </section>
   </div>
