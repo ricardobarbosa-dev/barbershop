@@ -11,7 +11,7 @@
 {% block content %}
   <header class="header-historico">
     <h1>HISTÓRICO E <span>AGENDAMENTOS</span></h1>
-    <p>Veja seu histórico e seus agendamentos.</p> 
+    <p>Veja seu histórico e seus agendamentos.</p>
   </header>
 
   <div class="appointments">
@@ -182,6 +182,18 @@
           <a href="?page={{ page_obj.next_page_number }}&status={{ status_atual }}">></a>
         {% endif %}
       </div>
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <span class="current">{{ num }}</span>
+        {% else %}
+          <a href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&status={{ status_atual }}">></a>
+      {% endif %}
     </div>
   </div>
 
@@ -266,7 +278,7 @@
     {% endif %}
   </div>
 
-  <div class="table-container">
+  {% comment %} <div class="table-container">
     <div class="table-header">
       <h3>Meus Agendamentos</h3>
       <button class="btn-export">EXPORTAR PDF</button>
@@ -332,7 +344,7 @@
           </tr>
         {% endif %}
       </tbody>
-    </table>
+    </table> {% endcomment %}
 
     <div class="table-footer">
       <p>
