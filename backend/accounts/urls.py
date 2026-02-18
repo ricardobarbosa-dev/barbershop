@@ -2,7 +2,6 @@ from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
 from .views import perfil_cliente
-from .views import listar_agendamentos
 
 urlpatterns = [
     path('login/', views.login_view, name='login'),
