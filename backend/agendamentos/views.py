@@ -214,7 +214,7 @@ def concluir_agendamento(request, agendamento_id):
         agendamento.save()
         messages.success(request, "Atendimento concluído com sucesso!")
 
-    return redirect('minha_agenda_barbeiro')
+    return redirect('agenda_barbeiro')
 
 @user_passes_test(e_staff)
 def gerenciar_pacotes(request):
@@ -234,7 +234,7 @@ def atualizar_status_agendamento(request, agendamento_id, status):
     agendamento.save()
     messages.success(request, f"Status alterado!")
     
-    url = reverse('minha_agenda_barbeiro')
+    url = reverse('agenda_barbeiro')
     return redirect(f"{url}?data={agendamento.data}")
 
 # ==========================================
@@ -245,35 +245,30 @@ def bloquear_agenda(request):
     if request.method == 'POST':
         barbeiro = get_object_or_404(Barbeiro, user=request.user)
         data = request.POST.get('data')
-        inicio = datetime.strptime(request.POST.get('hora_inicio'), '%H:%M')
-        fim = datetime.strptime(request.POST.get('hora_fim'), '%H:%M')
-        motivo = request.POST.get('motivo', 'Bloqueio')
+        hora_inicio = request.POST.get('hora_inicio')
+        hora_fim = request.POST.get('hora_fim')
+        motivo = request.POST.get('motivo', 'OUTRO')
 
-        disp = DisponibilidadeBarbeiro.objects.filter(barbeiro=request.user).first()
-        intervalo = disp.intervalo_minutos if disp else 30
+        BloqueioAgenda.objects.create(
+            barbeiro=barbeiro,
+            data=data,
+            hora_inicio=hora_inicio,
+            hora_fim=hora_fim,
+            motivo=motivo
+        )
 
-        atual = inicio
-        while atual < fim:
-            Agendamento.objects.get_or_create(
-                barbeiro=barbeiro, data=data, horario=atual.time(),
-                defaults={
-                    'cliente': request.user, 'servico': Servico.objects.first(),
-                    'status': 'CONCLUIDO', 'E_BLOQUEIO': True, 'OBSERVACAO': motivo
-                }
-            )
-            atual += timedelta(minutes=intervalo)
-
-        messages.success(request, 'Agenda bloqueada!')
-        url = reverse('minha_agenda_barbeiro')
+        messages.success(request, 'Período bloqueado com sucesso!')
+        url = reverse('agenda_barbeiro')
         return redirect(f"{url}?data={data}")
 
 @user_passes_test(e_staff)
 def remover_bloqueio(request, pk):
-    agendamento = get_object_or_404(Agendamento, pk=pk)
-    data = agendamento.data
-    agendamento.delete()
-    messages.success(request, "Horário liberado!")
-    url = reverse('minha_agenda_barbeiro')
+    bloqueio = get_object_or_404(BloqueioAgenda, pk=pk)
+    data = bloqueio.data
+    bloqueio.delete()
+
+    messages.success(request, "Bloqueio removido com sucesso!")
+    url = reverse('agenda_barbeiro')
     return redirect(f"{url}?data={data}")
 
 # ==========================================

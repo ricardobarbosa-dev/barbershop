@@ -10,193 +10,186 @@
 {% endblock %}
 
 {% block content %}
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-  <link rel="stylesheet" href="{% static 'agendamentos/css/agenda.css' %}" />
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  
-  <div class="container-card">
-    <header class="header-text">
-      <h1>AGENDA<span>MENTOS</span></h1>
-      <p>Veja seus agendamentos, bloqueio de horários.</p>
-    </header>
-    <section id="card" class="principal" style="padding: 1rem;">
-      <header class="agenda-header">
-        <div class="tabs-agenda" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-          <div style="display: flex; gap: 10px;">
-            <a href="{% url 'minha_agenda_barbeiro' %}?data={% now 'Y-m-d' %}" class="tab-btn {% if data_selecionada|date:'Y-m-d' == now|date:'Y-m-d' %}active{% endif %}" style="text-decoration: none; text-align: center;">Hoje</a>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+<link rel="stylesheet" href="{% static 'agendamentos/css/agenda.css' %}" />
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-            <form method="GET" id="date-form" class="form-date">
-              <input type="date" name="data" value="{{ data_selecionada|date:'Y-m-d' }}" class="input-date-agenda" onchange="this.form.submit()" />
-            </form>
-          </div>
+<div class="container-card">
+<header class="header-text">
+  <h1>AGENDA<span>MENTOS</span></h1>
+  <p>Veja seus agendamentos, bloqueio de horários.</p>
+</header>
 
-          <button type="button" class="btn-bloquear" id="openModal">
-            <i class="fas fa-ban"></i> Bloquear 
-          </button>
-        </div>
-      </header>
+<section id="card" class="principal" style="padding: 1rem;">
 
-      <div class="agenda-content">
-        {% for agendamento in agendamentos %}
-          {% if forloop.first %}
-            <span class="section-label"><i class="fas fa-circle"></i> PRÓXIMO HORÁRIO</span>
-            <div class="card-proximo {% if agendamento.E_BLOQUEIO %}bloqueio-destaque{% endif %}"
-             {% if agendamento.E_BLOQUEIO %}{% endif %}>
-              <div class="card-header-info">
-                <span class="time-main">{{ agendamento.horario|time:'H:i' }}</span>
-              </div>
+<header class="agenda-header">
+<div class="tabs-agenda" style="display:flex;justify-content:space-between;align-items:center;width:100%;">
+<div style="display:flex;gap:10px;">
+<a href="{% url 'minha_agenda_barbeiro' %}?data={% now 'Y-m-d' %}" 
+class="tab-btn {% if data_selecionada|date:'Y-m-d' == now|date:'Y-m-d' %}active{% endif %}">
+Hoje
+</a>
 
-              <div class="client-details">
-                {% if agendamento.E_BLOQUEIO %}
-                  <h3 style="color: #e74c3c;"><i class="fas fa-lock"></i> {{ agendamento.OBSERVACAO|upper|default:'INDISPONÍVEL' }}</h3>
-                  <p>Este horário está bloqueado para agendamentos.</p>
-                {% else %}
-                  <h3>{{ agendamento.cliente.get_full_name|default:agendamento.cliente.username }}</h3>
-                  <p><i class="fas fa-cut"></i> {{ agendamento.servico.nome }}</p>
-                {% endif %}
-              </div>
+<form method="GET" id="date-form" class="form-date">
+<input type="date" name="data"
+value="{{ data_selecionada|date:'Y-m-d' }}"
+class="input-date-agenda"
+onchange="this.form.submit()" />
+</form>
+</div>
 
-              <div class="card-footer-actions">
-                {% if agendamento.E_BLOQUEIO %}
-                  <a href="{% url 'remover_bloqueio' agendamento.id %}" class="btn-primary-agenda btn-confirmar-acao" data-titulo="Liberar Horário?" data-texto="Deseja remover este bloqueio?" data-icon="question" >LIBERAR HORÁRIO</a>
-                {% else %}
-                  {% if agendamento.status == 'PENDENTE' %}
-                    <a href="{% url 'atualizar_status_agendamento' agendamento.id 'AGENDADO' %}" class="btn-primary-agenda">CONFIRMAR</a>
-                  {% elif agendamento.status == 'AGENDADO' %}
-                    <a href="{% url 'concluir_agendamento' agendamento.id %}" class="btn-primary-agenda"><i class="fas fa-play"></i> INICIAR</a>
-                  {% else %}
-                    <span class="status-finalizado badge-{{ agendamento.status|lower }}">{{ agendamento.get_status_display|upper }}</span>
-                  {% endif %}
+<button type="button" class="btn-bloquear" id="openModal">
+<i class="fas fa-ban"></i> Bloquear
+</button>
+</div>
+</header>
 
-                  {% if agendamento.status in 'PENDENTE,AGENDADO' %}
-                    <a href="{% url 'atualizar_status_agendamento' agendamento.id 'CANCELADO' %}" class="btn-cancelar-x btn-confirmar-acao" data-titulo="Cancelar?" data-icon="warning"><i class="fas fa-times"></i></a>
-                  {% endif %}
-                {% endif %}
-              </div>
-            </div>
+<div class="agenda-content">
+{% with primeiro=agendamentos.first %}
+{% if primeiro and primeiro.E_BLOQUEIO and primeiro.horario|time:"H:i" == "00:00" %}
 
-            {% if not forloop.last %}<span class="section-label">RESTANTE DO DIA</span>{% endif %}
-          {% else %}
-            <div class="timeline-item">
-              <div class="timeline-time">{{ agendamento.horario|time:'H:i' }}</div>
-              <div class="timeline-card {% if agendamento.E_BLOQUEIO %}bloqueio-linha{% endif %}" {% if agendamento.E_BLOQUEIO %}{% endif %}>
-                <div class="user-avatar">
-                  {% if agendamento.E_BLOQUEIO %}
-                    <div class="avatar-placeholder" style="color: #e74c3c;"><i class="fas fa-ban"></i></div>
-                  {% elif agendamento.cliente.profile.foto %}
-                    <img src="{{ agendamento.cliente.profile.foto.url }}" />
-                  {% else %}
-                    <div class="avatar-placeholder">{{ agendamento.cliente.username|first|upper }}</div>
-                  {% endif %}
-                </div>
+<div class="card-proximo bloqueio-destaque" style="text-align:center;">
+<div class="card-header-info">
+<span class="time-main">🔒</span>
+</div>
 
-                <div class="user-info-agenda">
-                  <h4 class="text-truncate">
-                    {% if agendamento.E_BLOQUEIO %}{{ agendamento.OBSERVACAO|upper|default:'BLOQUEADO' }}{% else %}{{ agendamento.cliente.get_full_name|default:agendamento.cliente.username }}{% endif %}
-                  </h4>
-                  <p class="text-truncate">
-                    {% if agendamento.E_BLOQUEIO %}Indisponível{% else %}<i class="fas fa-cut"></i> {{ agendamento.servico.nome }}{% endif %}
-                  </p>
-                </div>
+<div class="client-details">
+<h3 style="color:#e74c3c;">
+<i class="fas fa-lock"></i> DIA TOTALMENTE BLOQUEADO
+</h3>
+<p>00:00 às 23:59</p>
+</div>
 
-                <div class="user-actions-list">
-                  {% if agendamento.E_BLOQUEIO %}
-                    <a href="{% url 'remover_bloqueio' agendamento.id %}" class="btn-action-list danger btn-confirmar-acao" data-titulo="Remover Bloqueio?"><i class="fas fa-trash"></i></a>
-                  {% elif agendamento.status in 'PENDENTE,AGENDADO' %}
-                    <a href="{% url 'concluir_agendamento' agendamento.id %}" class="btn-action-list success"><i class="fas fa-check"></i></a>
-                    <a href="{% url 'atualizar_status_agendamento' agendamento.id 'CANCELADO' %}" class="btn-action-list danger btn-confirmar-acao" data-titulo="Cancelar?"><i class="fas fa-times"></i></a>
-                  {% else %}
-                    <span class="badge-status badge-{{ agendamento.status|lower }}">{{ agendamento.get_status_display|upper }}</span>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-          {% endif %}
-        {% empty %}
-          <div class="empty-agenda">
-            <i class="far fa-calendar-times"></i>
-            <p style="color: #ff4d4d;">Nenhum agendamento encontrado.</p>
-          </div>
-        {% endfor %}
-      </div>
-    </section>
-  </div>
+<div class="card-footer-actions">
+<a href="{% url 'remover_bloqueio' primeiro.id %}"
+class="btn-primary-agenda btn-confirmar-acao"
+data-titulo="Liberar Dia?"
+data-texto="Deseja remover o bloqueio do dia inteiro?"
+data-icon="question">
+LIBERAR DIA
+</a>
+</div>
+</div>
 
-  <div class="custom-modal" id="modalBloqueio">
-    <div class="modal-container">
-      <form action="{% url 'bloquear_agenda' %}" method="POST">
-        {% csrf_token %}
-        <div class="modal-header-custom">
-          <h3><i class="fas fa-ban"></i> Bloquear Agenda</h3>
-          <button type="button" class="close-modal" id="closeModal">&times;</button>
-        </div>
-        <div class="modal-body-custom">
-          <div class="form-group">
-            <label>Data do Bloqueio</label>
-            <input type="date" name="data" class="input-date-agenda" value="{{ data_selecionada|date:'Y-m-d' }}" style="width: 100%;" required>
-          </div>
-          <div style="display: flex; gap: 15px;" class="row-mobile">
-            <div class="form-group" style="flex: 1;">
-              <label>Hora Início</label>
-              <input type="time" name="hora_inicio" class="input-date-agenda" style="width: 100%;" required>
-            </div>
-            <div class="form-group" style="flex: 1;">
-              <label>Hora Fim</label>
-              <input type="time" name="hora_fim" class="input-date-agenda" style="width: 100%;" required>
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Motivo</label>
-            <select name="motivo" class="input-date-agenda" style="width: 100%;">
-              <option value="Horário de Almoço">Horário de Almoço</option>
-              <option value="Compromisso Externo">Compromisso Externo</option>
-              <option value="Folga Parcial">Folga Parcial</option>
-              <option value="Manutenção / Limpeza">Manutenção / Limpeza</option>
-            </select>
-          </div>
-        </div>
-        <div class="modal-footer-custom">
-          <button type="button" class="btn-cancelar-x" id="btnSair" style="padding: 10px 20px; text-decoration: none; color:
-          #f5f5f5; font-weight: 600;">VOLTAR</button>
-          <button type="submit" class="btn-success" style="padding: 10px 20px;">CONFIRMAR BLOQUEIO</button>
-        </div>
-      </form>
-    </div>
-  </div>
+{% else %}
+{% for agendamento in agendamentos %}
+{% if forloop.first %}
+<span class="section-label">
+<i class="fas fa-circle"></i> PRÓXIMO HORÁRIO
+</span>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const modal = document.getElementById('modalBloqueio');
-        const btnOpen = document.getElementById('openModal');
-        const btnCloseX = document.getElementById('closeModal');
-        const btnSair = document.getElementById('btnSair');
+<div class="card-proximo {% if agendamento.E_BLOQUEIO %}bloqueio-destaque{% endif %}">
+<div class="card-header-info">
+<span class="time-main">{{ agendamento.horario|time:'H:i' }}</span>
+</div>
 
-        btnOpen.onclick = () => modal.classList.add('active');
-        btnCloseX.onclick = () => modal.classList.remove('active');
-        btnSair.onclick = () => modal.classList.remove('active');
-        
-        window.onclick = (event) => { if (event.target == modal) modal.classList.remove('active'); };
+<div class="client-details">
+{% if agendamento.E_BLOQUEIO %}
+<h3 style="color:#e74c3c;">
+<i class="fas fa-lock"></i>
+{{ agendamento.OBSERVACAO|upper|default:'INDISPONÍVEL' }}
+</h3>
+<p>Este horário está bloqueado.</p>
+{% else %}
+<h3>{{ agendamento.cliente.get_full_name|default:agendamento.cliente.username }}</h3>
+<p><i class="fas fa-cut"></i> {{ agendamento.servico.nome }}</p>
+{% endif %}
+</div>
 
-        const botoesConfirmacao = document.querySelectorAll('.btn-confirmar-acao');
-        botoesConfirmacao.forEach(botao => {
-            botao.addEventListener('click', function(e) {
-                e.preventDefault();
-                const url = this.getAttribute('href');
-                Swal.fire({
-                    title: this.getAttribute('data-titulo') || 'Confirmar?',
-                    text: this.getAttribute('data-texto') || 'Esta ação não pode ser desfeita.',
-                    icon: this.getAttribute('data-icon') || 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#f1c40f',
-                    cancelButtonColor: '#1a1a1a',
-                    confirmButtonText: 'Sim!',
-                    cancelButtonText: 'Voltar',
-                    background: '#161616',
-                    color: '#fff'
-                }).then((result) => { if (result.isConfirmed) window.location.href = url; });
-            });
-        });
-        
-    });
-  </script>
-{% endblock %}
+<div class="card-footer-actions">
+
+{% if agendamento.E_BLOQUEIO %}
+<a href="{% url 'remover_bloqueio' agendamento.id %}"
+class="btn-primary-agenda btn-confirmar-acao"
+data-titulo="Liberar Horário?"
+data-icon="question">
+LIBERAR
+</a>
+{% else %}
+
+{% if agendamento.status == 'PENDENTE' %}
+<a href="{% url 'atualizar_status_agendamento' agendamento.id 'AGENDADO' %}"
+class="btn-primary-agenda">
+CONFIRMAR
+</a>
+
+{% elif agendamento.status == 'AGENDADO' %}
+<a href="{% url 'concluir_agendamento' agendamento.id %}"
+class="btn-primary-agenda">
+<i class="fas fa-play"></i> INICIAR
+</a>
+
+{% else %}
+<span class="status-finalizado badge-{{ agendamento.status|lower }}">
+{{ agendamento.get_status_display|upper }}
+</span>
+{% endif %}
+
+{% endif %}
+</div>
+</div>
+
+{% if not forloop.last %}
+<span class="section-label">RESTANTE DO DIA</span>
+{% endif %}
+
+{% else %}
+
+<div class="timeline-item">
+<div class="timeline-time">
+{{ agendamento.horario|time:'H:i' }}
+</div>
+
+<div class="timeline-card {% if agendamento.E_BLOQUEIO %}bloqueio-linha{% endif %}">
+
+<div class="user-avatar">
+{% if agendamento.E_BLOQUEIO %}
+<div class="avatar-placeholder" style="color:#e74c3c;">
+<i class="fas fa-ban"></i>
+</div>
+{% elif agendamento.cliente.profile.foto %}
+<img src="{{ agendamento.cliente.profile.foto.url }}" />
+{% else %}
+<div class="avatar-placeholder">
+{{ agendamento.cliente.username|first|upper }}
+</div>
+{% endif %}
+</div>
+
+<div class="user-info-agenda">
+<h4>
+{% if agendamento.E_BLOQUEIO %}
+{{ agendamento.OBSERVACAO|upper|default:'BLOQUEADO' }}
+{% else %}
+{{ agendamento.cliente.get_full_name|default:agendamento.cliente.username }}
+{% endif %}
+</h4>
+
+<p>
+{% if agendamento.E_BLOQUEIO %}
+Indisponível
+{% else %}
+<i class="fas fa-cut"></i> {{ agendamento.servico.nome }}
+{% endif %}
+</p>
+</div>
+
+</div>
+</div>
+
+{% endif %}
+{% endfor %}
+
+{% empty %}
+<div class="empty-agenda">
+<i class="far fa-calendar-times"></i>
+<p style="color:#ff4d4d;">Nenhum agendamento encontrado.</p>
+</div>
+{% endfor %}
+
+{% endif %}
+{% endwith %}
+
+</div>
+</section>
+</div>
