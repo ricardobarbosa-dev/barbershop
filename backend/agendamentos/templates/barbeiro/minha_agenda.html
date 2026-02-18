@@ -25,14 +25,14 @@
       <header class="agenda-header">
         <div class="tabs-agenda" style="display:flex; justify-content:space-between; align-items:center; width:100%;">
           <div style="display:flex; gap:10px;">
-            <a href="{% url 'minha_agenda_barbeiro' %}?data={% now 'Y-m-d' %}" class="tab-btn" style="text-decoration:none;">Hoje</a>
+            <a href="{% url 'minha_agenda_barbeiro' %}?data={% now 'Y-m-d' %}" class="btn" style="text-decoration:none;">Hoje</a>
 
             <form method="GET" class="form-date">
-              <input type="date" name="data" value="{{ data_selecionada|date:'Y-m-d' }}" class="input-date-agenda" onchange="this.form.submit()" />
+              <input type="date" name="data" value="{{ data_selecionada|date:'Y-m-d' }}" class="input" onchange="this.form.submit()" />
             </form>
           </div>
 
-          <button type="button" class="btn-bloquear" id="openModal"><i class="fas fa-ban"></i> Bloquear</button>
+          <button type="button" class="btn btn-danger" id="openModal"><i class="fas fa-ban"></i> Bloquear</button>
         </div>
       </header>
 
@@ -48,6 +48,7 @@
               <div class="timeline-time">{{ agendamento.horario|time:'H:i' }}</div>
 
               <div class="timeline-card {% if agendamento.E_BLOQUEIO %}bloqueio-linha{% endif %}">
+                <!-- AVATAR -->
                 <div class="user-avatar">
                   {% if agendamento.E_BLOQUEIO %}
                     <div class="avatar-placeholder" style="color:#e74c3c;">
@@ -62,6 +63,7 @@
                   {% endif %}
                 </div>
 
+                <!-- INFO -->
                 <div class="user-info-agenda">
                   <h4>
                     {% if agendamento.E_BLOQUEIO %}
@@ -80,20 +82,21 @@
                   </p>
                 </div>
 
+                <!-- AÇÕES -->
                 <div class="user-actions-list">
                   {% if agendamento.E_BLOQUEIO %}
-                    <a href="{% url 'remover_bloqueio' agendamento.id %}" class="btn-action-list danger btn-confirmar-acao" data-titulo="Remover Bloqueio?"><i class="fas fa-trash"></i></a>
+                    <a href="{% url 'remover_bloqueio' agendamento.id %}" class="btn btn-danger btn-confirmar-acao" data-titulo="Remover Bloqueio?"><i class="fas fa-trash"></i></a>
                   {% else %}
                     {% if agendamento.status == 'PENDENTE' %}
-                      <a href="{% url 'atualizar_status_agendamento' agendamento.id 'AGENDADO' %}" class="btn-action-list success"><i class="fas fa-check"></i></a>
+                      <a href="{% url 'atualizar_status_agendamento' agendamento.id 'AGENDADO' %}" class="btn btn-success"><i class="fas fa-check"></i></a>
                     {% endif %}
 
                     {% if agendamento.status == 'AGENDADO' %}
-                      <a href="{% url 'concluir_agendamento' agendamento.id %}" class="btn-action-list success"><i class="fas fa-play"></i></a>
+                      <a href="{% url 'concluir_agendamento' agendamento.id %}" class="btn btn-success"><i class="fas fa-play"></i></a>
                     {% endif %}
 
                     {% if agendamento.status == 'PENDENTE' or agendamento.status == 'AGENDADO' %}
-                      <a href="{% url 'atualizar_status_agendamento' agendamento.id 'CANCELADO' %}" class="btn-action-list danger btn-confirmar-acao" data-titulo="Cancelar?"><i class="fas fa-times"></i></a>
+                      <a href="{% url 'atualizar_status_agendamento' agendamento.id 'CANCELADO' %}" class="btn btn-danger btn-confirmar-acao" data-titulo="Cancelar?"><i class="fas fa-times"></i></a>
                     {% else %}
                       <span class="badge-status badge-{{ agendamento.status|lower }}">{{ agendamento.get_status_display }}</span>
                     {% endif %}
@@ -120,23 +123,23 @@
 
         <div class="modal-header-custom">
           <h3><i class="fas fa-ban"></i> Bloquear Agenda</h3>
-          <button type="button" class="close-modal" id="closeModal">&times;</button>
+          <button type="button" class="btn" id="closeModal">&times;</button>
         </div>
 
         <div class="modal-body-custom">
           <div class="form-group">
             <label>Data</label>
-            <input type="date" name="data" value="{{ data_selecionada|date:'Y-m-d' }}" class="input-date-agenda" required />
+            <input type="date" name="data" value="{{ data_selecionada|date:'Y-m-d' }}" class="input" required />
           </div>
 
           <div style="display:flex; gap:15px;">
-            <input type="time" name="hora_inicio" required />
-            <input type="time" name="hora_fim" required />
+            <input type="time" name="hora_inicio" class="input" required />
+            <input type="time" name="hora_fim" class="input" required />
           </div>
 
           <div class="form-group">
             <label>Motivo</label>
-            <select name="motivo">
+            <select name="motivo" class="input">
               <option value="ALMOCO">Horário de Almoço</option>
               <option value="PARTICULAR">Assunto Particular</option>
               <option value="FOLGA">Folga</option>
@@ -146,8 +149,8 @@
         </div>
 
         <div class="modal-footer-custom">
-          <button type="button" id="btnSair">Voltar</button>
-          <button type="submit">Confirmar</button>
+          <button type="button" class="btn" id="btnSair">Voltar</button>
+          <button type="submit" class="btn btn-success">Confirmar</button>
         </div>
       </form>
     </div>
@@ -160,15 +163,23 @@
       const closeBtn = document.getElementById('closeModal')
       const btnSair = document.getElementById('btnSair')
     
-      openBtn.onclick = () => modal.classList.add('active')
-      closeBtn.onclick = () => modal.classList.remove('active')
-      btnSair.onclick = () => modal.classList.remove('active')
+      openBtn.addEventListener('click', () => {
+        modal.classList.add('active')
+      })
     
-      window.onclick = (e) => {
-        if (e.target == modal) {
+      closeBtn.addEventListener('click', () => {
+        modal.classList.remove('active')
+      })
+    
+      btnSair.addEventListener('click', () => {
+        modal.classList.remove('active')
+      })
+    
+      window.addEventListener('click', (e) => {
+        if (e.target === modal) {
           modal.classList.remove('active')
         }
-      }
+      })
     })
   </script>
 {% endblock %}
