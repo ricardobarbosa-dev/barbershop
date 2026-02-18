@@ -70,7 +70,7 @@
                 —
               {% endif %}
             </div>
-            <!-- filtro agendamentos -->
+            <!-- filtro agendamentos desk -->
             <div class="filtro-agendamentos">
               <a href="?status=PENDENTE" class="filtro-btn {% if status_atual == 'PENDENTE' %}ativo{% endif %}">
                 Pendentes
@@ -82,12 +82,12 @@
               </a>
               <a href="?status=CANCELADO" class="filtro-btn {% if status_atual == 'CANCELADO' %}ativo{% endif %}">
                 Cancelados
-                <span>{{ total_cancelados }}</span> 
+                <span>{{ total_cancelados }}</span>
               </a>
             </div>
             <!-- fim filtro -->
           </section>
-        {% endfor %} 
+        {% endfor %}
       {% else %}
         <p style="text-align:center; padding:20px;">Você não possui agendamentos.</p>
       {% endif %}
@@ -174,7 +174,7 @@
             <path d="m40-120 440-760 440 760H40Zm138-80h604L480-720 178-200Zm330.5-51.5Q520-263 520-280t-11.5-28.5Q497-320 480-320t-28.5 11.5Q440-297 440-280t11.5 28.5Q463-240 480-240t28.5-11.5ZM440-360h80v-200h-80v200Zm40-100Z" />
           </svg>Os cancelamentos devem ser realizados com pelo menos 2 horas de antecedência.
         </p>
-        <!-- filtro agendamentos -->
+        <!-- filtro agendamentos mob -->
         <div class="filtro-agendamentos">
           <a href="?status=PENDENTE" class="filtro-btn {% if status_atual == 'PENDENTE' %}ativo{% endif %}">
             Pendentes
