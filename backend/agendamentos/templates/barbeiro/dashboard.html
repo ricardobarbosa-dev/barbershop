@@ -10,6 +10,8 @@
 {% endblock %}
 {% block content %}
   <link rel="stylesheet" href="{% static 'agendamentos/css/dashboard_barbeiro.css' %}" />
+  <link rel="stylesheet" href="{% static 'agendamentos/css/agenda.css' %}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 
   <div class="container-card" style="display: block;">
     <header class="header-text">
@@ -51,7 +53,6 @@
         <div class="monthly-item">
           <div class="monthly-info">
             <div class="icon-bg">
-              <i class="fas fa-calendar-alt"></i>
               <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
                 <path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-188.5-11.5Q280-423 280-440t11.5-28.5Q303-480 320-480t28.5 11.5Q360-457 360-440t-11.5 28.5Q337-400 320-400t-28.5-11.5ZM640-400q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-188.5-11.5Q280-263 280-280t11.5-28.5Q303-320 320-320t28.5 11.5Q360-297 360-280t-11.5 28.5Q337-240 320-240t-28.5-11.5ZM640-240q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z" />
               </svg>
@@ -67,7 +68,7 @@
         <div class="monthly-item">
           <div class="monthly-info">
             <div class="icon-bg">
-              <i class="fas fa-wallet"></i> <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
                 <path d="M200-200v-560 560Zm0 80q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v100h-80v-100H200v560h560v-100h80v100q0 33-23.5 56.5T760-120H200Zm320-160q-33 0-56.5-23.5T440-360v-240q0-33 23.5-56.5T520-680h280q33 0 56.5 23.5T880-600v240q0 33-23.5 56.5T800-280H520Zm280-80v-240H520v240h280Zm-117.5-77.5Q700-455 700-480t-17.5-42.5Q665-540 640-540t-42.5 17.5Q580-505 580-480t17.5 42.5Q615-420 640-420t42.5-17.5Z" />
               </svg>
             </div>
@@ -88,8 +89,34 @@
       <div class="agenda-container">
         {% if agendamentos_hoje %}
           {% for a in agendamentos_hoje %}
-            <div class="appointment-item">
-              <span>{{ a.horario }} - {{ a.cliente.first_name }}</span>
+            <div class="agenda-row">
+              <div class="timeline-time">{{ a.horario|time:'H:i' }}</div>
+
+              <div class="timeline-card">
+                <div class="user-avatar">
+                  {% if a.cliente.profile.foto %}
+                    <img src="{{ a.cliente.profile.foto.url }}" alt="{{ a.cliente.first_name }}" />
+                  {% else %}
+                    <div class="avatar-placeholder">{{ a.cliente.username|first|upper }}</div>
+                  {% endif %}
+                </div>
+
+                <div class="user-info-agenda">
+                  <h4 class="text-truncate">{{ a.cliente.get_full_name|default:a.cliente.username|title }}</h4>
+                  <p class="text-truncate">
+                    <i class="fas fa-cut"></i> {{ a.servico.nome }}
+                  </p>
+                </div>
+
+                <div class="user-actions-list">
+                  {% if a.status == 'PENDENTE' or a.status == 'AGENDADO' %}
+                    <a href="{% url 'concluir_agendamento' a.id %}" class="btn-action-list success" title="Concluir"><i class="fas fa-check"></i></a>
+                    <a href="{% url 'atualizar_status_agendamento' a.id 'CANCELADO' %}" class="btn-action-list danger btn-confirmar-acao" data-titulo="Cancelar?"><i class="fas fa-times"></i></a>
+                  {% else %}
+                    <span class="badge-status badge-{{ a.status|lower }}">{{ a.get_status_display|upper }}</span>
+                  {% endif %}
+                </div>
+              </div>
             </div>
           {% endfor %}
         {% else %}

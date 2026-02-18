@@ -87,6 +87,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-direction: row;
+    gap: 8px;
+    margin-bottom: 20px;
 }
 
 .live-badge {
@@ -99,12 +102,39 @@
 }
 
 .agenda-container {
-    background: var(--card-bg);
-    border-radius: 20px;
-    border: 1px dashed #333;
-    padding: 40px 20px;
-    text-align: center;
-    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+}
+
+.agenda-row {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+}
+
+.timeline-time {
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #ffcc00;
+    padding-left: 5px;
+}
+
+.timeline-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    padding: 10px;
+    min-width: 0;
+}
+
+.user-info-agenda {
+    flex: 1;
+    min-width: 0;
 }
 
 .empty-state .emoji {
@@ -140,5 +170,25 @@
 @media (min-width: 768px) {
     .dashboard-wrapper {
         max-width: 800px;
+    }
+
+    .agenda-row {
+        flex-direction: row;
+        /* Volta a ficar lado a lado */
+        align-items: center;
+        gap: 15px;
+    }
+
+    .timeline-time {
+        min-width: 50px;
+        font-size: 1rem;
+        padding-left: 0;
+    }
+
+    .section-header-inline {
+        flex-direction: row;
+        /* Título e Badge lado a lado */
+        justify-content: space-between;
+        align-items: center;
     }
 }
