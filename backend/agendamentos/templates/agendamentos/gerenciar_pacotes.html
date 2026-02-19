@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-  Gerenciar Pacotes
+  Dashboard Barbeiro | Pacotes
 {% endblock %}
 
 {% block breadcrumb %}
@@ -32,11 +32,15 @@
                 <div class="info-status">
                   <strong class="status {% if p.ativo and not p.expirado %}
                       
+                      
                       status-concluido
+
 
                     {% else %}
                       
+                      
                       status-cancelado
+
 
                     {% endif %}">
                     {% if p.ativo and not p.expirado %}
@@ -111,11 +115,15 @@
               <td>
                 <span class="status {% if p.ativo and not p.expirado %}
                     
+                    
                     status-concluido
+
 
                   {% else %}
                     
+                    
                     status-cancelado
+
 
                   {% endif %}">
                   {% if p.ativo and not p.expirado %}
@@ -160,7 +168,7 @@
             <button type="submit" class="btn-success">Confirmar</button>
             <button type="button" onclick="closeM()" class="btn-bloquear">Cancelar</button>
           </div>
-        </form> 
+        </form>
       </div>
     </div>
 
