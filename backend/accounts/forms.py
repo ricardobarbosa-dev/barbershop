@@ -5,15 +5,13 @@ from .models import Profile
 import re
 
 class UserUpdateForm(forms.ModelForm):
-    # Definimos como required=False para o Django não travar a validação
-    # e disabled=True para o Django ignorar qualquer tentativa de alteração no POST
     email = forms.EmailField(
         label="Email",
         required=False, 
         disabled=True,
         widget=forms.EmailInput(attrs={
             'class': 'form-input',
-            'readonly': 'readonly', # Reforço no HTML
+            'readonly': 'readonly', 
             'style': 'color: #888; cursor: not-allowed;'
         })
     )
@@ -92,15 +90,24 @@ class ProfileUpdateForm(forms.ModelForm):
 class ProfileForm(forms.ModelForm): 
     class Meta:
         model = Profile
-        fields = ['foto', 'banner', 'localizacao', 'whatsapp', 'instagram', 'facebook', 'site_pessoal']        
+        fields = [
+            'foto', 'banner', 'localizacao', 'whatsapp', 
+            'instagram', 'facebook', 'site_pessoal', 
+            'anos_experiencia', 'cortes_feitos', 'especialidade'
+        ]        
         labels = {
             'localizacao': 'Sua Localização',
             'whatsapp': 'WhatsApp (apenas números)',
-            'site_pessoal': 'Seu Site ou Link'
+            'site_pessoal': 'Seu Site ou Link',
+            'anos_experiencia': 'Anos de Experiência',
+            'cortes_feitos': 'Total de Cortes Realizados',
+            'especialidade': 'Sua Especialidade (Ex: Degradê e Navalha)'
         }
         widgets = {
             'foto': forms.FileInput(attrs={'class': 'input-file-hidden'}),
             'banner': forms.FileInput(attrs={'class': 'input-file-hidden'}),
+            'anos_experiencia': forms.NumberInput(attrs={'class': 'input-padrao-perfil'}),
+            'cortes_feitos': forms.NumberInput(attrs={'class': 'input-padrao-perfil'}),
         }
 
 class ExtendedUserCreationForm(UserCreationForm):

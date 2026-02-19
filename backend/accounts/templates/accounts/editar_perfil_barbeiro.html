@@ -42,7 +42,6 @@
         </div>
 
         <h4 class="section-subtitle">REDES SOCIAIS</h4>
-
         <div class="row-inputs">
           <div class="group-layout">
             <label class="social-label">WhatsApp</label>
@@ -75,6 +74,36 @@
             <div class="input-with-icon">
               <i class="fas fa-globe"></i>
               <input type="url" name="site_pessoal" placeholder="https://..." value="{{ form.site_pessoal.value|default:'' }}" />
+            </div>
+          </div>
+        </div>
+
+        <h4 class="section-subtitle">EXPERIÊNCIA E ESTATÍSTICAS</h4>
+
+        <div class="row-inputs">
+          <div class="group-layout">
+            <label class="social-label">Anos de Experiência</label>
+            <div class="input-with-icon">
+              <i class="fas fa-briefcase"></i>
+              <input type="number" name="anos_experiencia" placeholder="Ex: 5" value="{{ form.anos_experiencia.value|default:0 }}" />
+            </div>
+          </div>
+
+          <div class="group-layout">
+            <label class="social-label">Cortes Feitos</label>
+            <div class="input-with-icon">
+              <i class="fas fa-cut"></i>
+              <input type="number" name="cortes_feitos" placeholder="Ex: 150" value="{{ form.cortes_feitos.value|default:0 }}" />
+            </div>
+          </div>
+        </div>
+
+        <div class="row-inputs">
+          <div class="group-layout">
+            <label class="social-label">Especialidade Principal</label>
+            <div class="input-with-icon">
+              <i class="fas fa-certificate"></i>
+              <input type="text" name="especialidade" placeholder="Ex: Especialista em Barba Clássica" value="{{ form.especialidade.value|default:'' }}" />
             </div>
           </div>
         </div>

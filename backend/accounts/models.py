@@ -49,6 +49,9 @@ class Profile(models.Model):
     instagram = models.CharField(max_length=100, blank=True, null=True)
     facebook = models.CharField(max_length=100, blank=True, null=True)
     site_pessoal = models.URLField(max_length=200, blank=True, null=True)
+    anos_experiencia = models.PositiveIntegerField(default=0, blank=True, null=True)
+    cortes_feitos = models.PositiveIntegerField(default=0, blank=True, null=True)
+    especialidade = models.CharField(max_length=100, blank=True, null=True, default="Barbeiro Profissional")
 
     def __str__(self):
         return f"{self.user.username} ({self.get_tipo_display()})"

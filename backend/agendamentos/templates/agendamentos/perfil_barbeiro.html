@@ -25,8 +25,12 @@
           </div>
         </div>
 
-        <h1 class="profile-name">{{ barbeiro.get_full_name }}</h1>
-        <p class="profile-title" style="color: #FFD700;">Barbeiro Profissional</p>
+        <h1 class="profile-name">{{ barbeiro.get_full_name|title }}</h1>
+        {% if perfil.especialidade %}
+          <p class="profile-title" style="color: #FFD700;">
+            <i class="fas fa-star" style="color: #FFD700;"></i> {{ perfil.especialidade }}
+          </p>
+        {% endif %}
 
         {% if perfil.localizacao %}
           <p class="location">
@@ -55,11 +59,12 @@
 
       <section class="stats-grid">
         <div class="stat-card">
-          <span class="stat-value">05</span>
+          <span class="stat-value">{{ perfil.anos_experiencia|default:0|stringformat:'02d' }}</span>
           <span class="stat-label">ANOS EXP.</span>
         </div>
+
         <div class="stat-card">
-          <span class="stat-value">120+</span>
+          <span class="stat-value">{{ perfil.cortes_feitos|default:0 }}+</span>
           <span class="stat-label">CORTES FEITOS</span>
         </div>
       </section>
