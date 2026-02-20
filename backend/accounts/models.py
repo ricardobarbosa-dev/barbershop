@@ -59,3 +59,13 @@ class Profile(models.Model):
 @receiver(post_save, sender=User)
 def criar_profile(sender, instance, created, **kwargs):
     Profile.objects.get_or_create(user=instance)
+
+
+class BarberPhoto(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='gallery')
+    image = models.ImageField(upload_to='barber_gallery/')
+    description = models.CharField(max_length=100, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Foto de {self.profile.user.username}"

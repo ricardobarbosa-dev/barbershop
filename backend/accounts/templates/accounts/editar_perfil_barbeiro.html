@@ -17,6 +17,7 @@
     <header class="header-text">
       <h1>EDITAR <span>PERFIL</span></h1>
       <p>Personalize suas fotos, localização e redes sociais.</p>
+      <h4><a href="{% url 'perfil_barbeiro' perfil.user.id %}"><span>Ver meu perfil</span></a></h4>
     </header>
 
     <section id="card" class="principal">
@@ -82,7 +83,7 @@
 
         <div class="row-inputs">
           <div class="group-layout">
-            <label class="social-label">Anos de Experiência</label>
+            <label class="social-label">Anos de Exp.</label>
             <div class="input-with-icon">
               <i class="fas fa-briefcase"></i>
               <input type="number" name="anos_experiencia" placeholder="Ex: 5" value="{{ form.anos_experiencia.value|default:0 }}" />
@@ -97,7 +98,7 @@
             </div>
           </div>
         </div>
-
+        <br />
         <div class="row-inputs">
           <div class="group-layout">
             <label class="social-label">Especialidade Principal</label>
@@ -106,6 +107,38 @@
               <input type="text" name="especialidade" placeholder="Ex: Especialista em Barba Clássica" value="{{ form.especialidade.value|default:'' }}" />
             </div>
           </div>
+        </div>
+
+        <h4 class="section-subtitle">GALERIA</h4>
+        <div class="row-inputs">
+          <div class="group-layout">
+            <label class="social-label">Nova Imagem</label>
+            <div class="input-with-icon">
+              <i class="fas fa-camera"></i>
+              <input type="file" name="image" accept="image/*" />
+            </div>
+          </div>
+          <div class="group-layout">
+            <label class="social-label">Descrição</label>
+            <div class="input-with-icon">
+              <i class="fas fa-comment-dots"></i>
+              <input type="text" name="description" placeholder="Ex: Degradê Navalhado" />
+            </div>
+          </div>
+        </div>
+
+        <h4 class="section-subtitle">MINHAS FOTOS ATUAIS</h4>
+        <div class="gallery-edit-grid">
+          {% for foto in perfil.gallery.all %}
+            <div class="photo-container">
+              <img src="{{ foto.image.url }}" alt="Foto do portfólio" />
+
+              <form action="{% url 'excluir_foto_galeria' foto.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn-delete-photo" title="Excluir"><i class="fas fa-times"></i></button>
+              </form>
+            </div>
+          {% endfor %}
         </div>
 
         <div class="form-actions-premium">

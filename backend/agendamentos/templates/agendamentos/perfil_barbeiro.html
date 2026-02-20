@@ -69,9 +69,25 @@
         </div>
       </section>
 
+      <h3 class="section-subtitle">Galeria</h3>
+      <div class="gallery-grid rating-card">
+        {% for foto in perfil.gallery.all %}
+          <div class="gallery-item">
+            <img src="{{ foto.image.url }}" alt="{{ foto.description }}" />
+            {% if foto.description %}
+              <div class="gallery-overlay">
+                <span>{{ foto.description }}</span>
+              </div>
+            {% endif %}
+          </div>
+        {% empty %}
+          <p class="empty-msg">Nenhuma foto no portfólio.</p>
+        {% endfor %}
+      </div>
+
       <section class="satisfaction-section">
         <div class="section-header">
-          <h2>Avaliações</h2>
+          <h3 class="section-subtitle">Avaliações</h3>
           <div class="mini-rating">★ {{ media|floatformat:1 }}</div>
         </div>
 

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.models import User
@@ -6,16 +6,15 @@ from django.contrib.auth.forms import PasswordChangeForm, UserCreationForm
 from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
-from .models import OTP, Profile
+from .models import OTP, Profile, BarberPhoto
 from .services import enviar_sms
 import traceback, random
 from django import forms
 from django.contrib.auth.decorators import login_required
-from .forms import UserUpdateForm, ProfileUpdateForm, ProfileForm, ExtendedUserCreationForm
+from .forms import UserUpdateForm, ProfileUpdateForm, ProfileForm, ExtendedUserCreationForm, BarberPhotoForm
 from agendamentos.models import Agendamento
 from django.core.paginator import Paginator
 from .decorators import no_access
-
 
 # Login tradicional
 @no_access
@@ -251,33 +250,57 @@ def historico_cliente(request):
 @login_required
 def editar_perfil_barbeiro(request):
     profile = request.user.profile
+    
     if request.method == 'POST':
-        form = ProfileForm(
-            request.POST,
-            request.FILES,
-            instance=profile
-        )
-
+        form = ProfileForm(request.POST, request.FILES, instance=profile)
+        photo_form = BarberPhotoForm(request.POST, request.FILES)
+        
         if form.is_valid():
             form.save()
+            
+            if photo_form.is_valid() and 'image' in request.FILES:
+                nova_foto = photo_form.save(commit=False)
+                nova_foto.profile = profile  
+                nova_foto.save()
+                messages.success(request, "Foto adicionada à galeria!")
+            
             messages.success(request, "Perfil atualizado!")
-            return redirect('dashboard_barbeiro')
-
+            return redirect('perfil_barbeiro', user_id=request.user.id)
     else:
         form = ProfileForm(instance=profile)
+        photo_form = BarberPhotoForm()
 
     return render(
         request,
         'accounts/editar_perfil_barbeiro.html',
-        {'form': form}
+        {
+            'form': form,
+            'photo_form': photo_form,  
+            'perfil': profile
+        }
     )
+
+# delete gallery
+@login_required
+def excluir_foto_galeria(request, foto_id):
+    foto = get_object_or_404(BarberPhoto, id=foto_id, profile=request.user.profile)
+    if request.method == 'POST':
+        foto.delete()
+        messages.success(request, "Foto removida com sucesso!")
+    
+    return redirect('editar_perfil_barbeiro')
 
 # redirect 
 @login_required
 def redirect_dashboard(request):
     user = request.user
-    if user.groups.filter(name='dono').exists():
-        return redirect('dashboard_dono')
-    if user.groups.filter(name='funcionario').exists():
+    try:
+        perfil = user.profile
+        tipo_usuario = perfil.tipo
+    except Profile.DoesNotExist:
+        tipo_usuario = Profile.CLIENTE
+
+    if tipo_usuario in [Profile.DONO, Profile.FUNCIONARIO]:
         return redirect('dashboard_barbeiro')
+    
     return redirect('dashboard_cliente')

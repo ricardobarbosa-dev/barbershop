@@ -17,6 +17,7 @@ urlpatterns = [
     path('historico/', views.historico_cliente, name='historico_cliente'),
     # path('editar-perfil/', views.editar_perfil_barbeiro, name='editar_perfil_barbeiro'),
     path('perfil/editar/', views.editar_perfil_barbeiro, name='editar_perfil_barbeiro'),
+    path('perfil/foto/excluir/<int:foto_id>/', views.excluir_foto_galeria, name='excluir_foto_galeria'),
     path('redirect/', views.redirect_dashboard, name='redirect_dashboard'), 
 ]
 

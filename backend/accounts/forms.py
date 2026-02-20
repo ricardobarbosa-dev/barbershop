@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import Profile
+from .models import Profile, BarberPhoto
 import re
 
 class UserUpdateForm(forms.ModelForm):
@@ -117,3 +117,13 @@ class ExtendedUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = User
         fields = UserCreationForm.Meta.fields + ('first_name', 'last_name')
+        
+        
+class BarberPhotoForm(forms.ModelForm):
+    class Meta:
+        model = BarberPhoto
+        fields = ['image', 'description']
+        widgets = {
+            'image': forms.FileInput(attrs={'class': 'input-file-hidden', 'accept': 'image/*'}),
+            'description': forms.TextInput(attrs={'placeholder': 'Descreva o corte (opcional)', 'class': 'input-padrao-perfil'})
+        }
