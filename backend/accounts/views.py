@@ -279,5 +279,5 @@ def redirect_dashboard(request):
     if user.groups.filter(name='dono').exists():
         return redirect('dashboard_dono')
     if user.groups.filter(name='funcionario').exists():
-        return redirect('dashboard_funcionario')
+        return redirect('dashboard_barbeiro')
     return redirect('dashboard_cliente')
