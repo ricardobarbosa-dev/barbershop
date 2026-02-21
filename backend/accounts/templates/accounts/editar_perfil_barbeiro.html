@@ -86,7 +86,7 @@
             <label class="social-label">Anos de Exp.</label>
             <div class="input-with-icon">
               <i class="fas fa-briefcase"></i>
-              <input type="number" name="anos_experiencia" placeholder="Ex: 5" value="{{ form.anos_experiencia.value|default:0 }}" />
+              <input type="number" name="years_experience" placeholder="Ex: 5" value="{{ form.years_experience.value|default:0 }}" />
             </div>
           </div>
 
@@ -94,7 +94,7 @@
             <label class="social-label">Cortes Feitos</label>
             <div class="input-with-icon">
               <i class="fas fa-cut"></i>
-              <input type="number" name="cortes_feitos" placeholder="Ex: 150" value="{{ form.cortes_feitos.value|default:0 }}" />
+              <input type="number" name="cuts_made" placeholder="Ex: 150" value="{{ form.cuts_made.value|default:0 }}" />
             </div>
           </div>
         </div>
@@ -104,12 +104,12 @@
             <label class="social-label">Especialidade Principal</label>
             <div class="input-with-icon">
               <i class="fas fa-certificate"></i>
-              <input type="text" name="especialidade" placeholder="Ex: Especialista em Barba Clássica" value="{{ form.especialidade.value|default:'' }}" />
+              <input type="text" name="specialty" placeholder="Ex: Especialista em Barba Clássica" value="{{ form.specialty.value|default:'' }}" />
             </div>
           </div>
         </div>
 
-        <h4 class="section-subtitle">GALERIA</h4>
+        <h4 class="section-subtitle">ADICIONAR À GALERIA</h4>
         <div class="row-inputs">
           <div class="group-layout">
             <label class="social-label">Nova Imagem</label>
@@ -127,25 +127,26 @@
           </div>
         </div>
 
-        <h4 class="section-subtitle">MINHAS FOTOS ATUAIS</h4>
-        <div class="gallery-edit-grid">
-          {% for foto in perfil.gallery.all %}
-            <div class="photo-container">
-              <img src="{{ foto.image.url }}" alt="Foto do portfólio" />
-
-              <form action="{% url 'excluir_foto_galeria' foto.id %}" method="post">
-                {% csrf_token %}
-                <button type="submit" class="btn-delete-photo" title="Excluir"><i class="fas fa-times"></i></button>
-              </form>
-            </div>
-          {% endfor %}
-        </div>
-
         <div class="form-actions-premium">
-          <button type="submit" class="btn-save-premium">SALVAR</button>
+          <button type="submit" class="btn-save-premium">SALVAR ALTERAÇÕES</button>
           <a href="{% url 'dashboard_barbeiro' %}" class="btn-cancel-premium">CANCELAR</a>
         </div>
       </form>
+      <hr style="border: 0; border-top: 1px solid #333; margin: 40px 0;" />
+
+      <h4 class="section-subtitle">MINHAS FOTOS ATUAIS</h4>
+      <div class="gallery-edit-grid">
+        {% for foto in perfil.gallery.all %}
+          <div class="photo-container">
+            <img src="{{ foto.image.url }}" alt="Foto do portfólio" />
+
+            <form action="{% url 'excluir_foto_galeria' foto.id %}" method="post" style="margin: 0;">
+              {% csrf_token %}
+              <button type="submit" class="btn-delete-photo" title="Excluir"><i class="fas fa-times"></i></button>
+            </form>
+          </div>
+        {% endfor %}
+      </div>
     </section>
   </div>
 {% endblock %}
