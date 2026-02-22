@@ -1,0 +1,104 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}
+  Dashboard Barbeiro | Controle de Devedores
+{% endblock %}
+
+{% block breadcrumb %}
+  Dashboard / <strong>Devedores</strong>
+{% endblock %}
+
+{% block content %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link rel="stylesheet" href="{% static 'agendamentos/css/agenda.css' %}" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <div class="container-card">
+    <header class="header-text">
+      <h1>DEVE<span>DORES</span></h1>
+      <p>Gerenciamento de taxas de cancelamento pendentes.</p>
+    </header>
+
+    <section id="card" class="principal" style="padding: 1rem;">
+      <header class="agenda-header">
+        <div class="tabs-agenda" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <div style="display: flex; gap: 10px;">
+            <a href="{% url 'minha_agenda_barbeiro' %}" class="tab-btn" style="text-decoration: none; text-align: center;">Voltar para Agenda</a>
+          </div>
+        </div>
+      </header>
+
+      <div class="agenda-content">
+        <span class="section-label"><i class="fas fa-hand-holding-usd"></i> CLIENTES COM DÉBITO</span>
+
+        {% for perfil in devedores %}
+          <div class="timeline-item">
+            <div class="timeline-card" style="margin-left: 0; padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="user-avatar">
+                  {% if perfil.foto %}
+                    <img src="{{ perfil.foto.url }}" />
+                  {% else %}
+                    <div class="avatar-placeholder">{{ perfil.user.username|first|upper }}</div>
+                  {% endif %}
+                </div>
+
+                <div class="user-info-agenda">
+                  <h4 class="text-truncate" style="margin-bottom: 5px;">{{ perfil.user.get_full_name|default:perfil.user.username|title }}</h4>
+                  <p>
+                    Saldo Devedor: <strong>R$ {{ perfil.saldo_devedor }}</strong>
+                  </p>
+                </div>
+              </div>
+
+              <div class="user-actions-list">
+                <form action="{% url 'quitar_debito' perfil.user.id %}" method="POST" class="form-quitar">
+                  {% csrf_token %}
+                  <button type="submit" class="btn-action-list success btn-confirmar-pagamento" title="Marcar como Pago" data-nome="{{ perfil.user.get_full_name|default:perfil.user.username }}" data-valor="{{ perfil.saldo_devedor }}"><i class="fas fa-check"></i></button>
+                </form>
+              </div>
+            </div>
+          </div>
+        {% empty %}
+          <div class="empty-agenda">
+            <i class="fas fa-check-circle" style="color: #27ae60;"></i>
+            <p style="color: #27ae60;">Tudo em dia! Nenhum cliente possui débitos.</p>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const formsQuitar = document.querySelectorAll('.form-quitar')
+    
+      formsQuitar.forEach((form) => {
+        form.addEventListener('submit', function (e) {
+          e.preventDefault()
+          const btn = this.querySelector('.btn-confirmar-pagamento')
+          const nomeCliente = btn.getAttribute('data-nome')
+          const valor = btn.getAttribute('data-valor')
+    
+          Swal.fire({
+            title: 'Confirmar Pagamento?',
+            text: `Deseja quitar o débito de R$ ${valor} do cliente ${nomeCliente}?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#27ae60',
+            cancelButtonColor: '#1a1a1a',
+            confirmButtonText: 'Sim, Pago!',
+            cancelButtonText: 'Cancelar',
+            background: '#161616',
+            color: '#fff'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              this.submit()
+            }
+          })
+        })
+      })
+    })
+  </script>
+{% endblock %}

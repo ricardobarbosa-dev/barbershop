@@ -43,7 +43,6 @@ class Profile(models.Model):
     telefone = models.CharField(max_length=20, blank=True, null=True)
     foto = models.ImageField(upload_to='profiles/', blank=True, null=True)
     banner = models.ImageField(upload_to='banners/', blank=True, null=True)
-
     localizacao = models.CharField(max_length=255, blank=True, null=True)
     whatsapp = models.CharField(max_length=20, blank=True, null=True)
     instagram = models.CharField(max_length=100, blank=True, null=True)
@@ -52,9 +51,11 @@ class Profile(models.Model):
     anos_experiencia = models.PositiveIntegerField(default=0, blank=True, null=True)
     cortes_feitos = models.PositiveIntegerField(default=0, blank=True, null=True)
     especialidade = models.CharField(max_length=100, blank=True, null=True, default="Barbeiro Profissional")
+    saldo_devedor = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     def __str__(self):
-        return f"{self.user.username} ({self.get_tipo_display()})"
+        saldo_formatado = f"{self.saldo_devedor:.2f}".replace('.', ',')
+        return f"{self.user.username} ({self.get_tipo_display()}) | Débito: R$ {saldo_formatado}" 
     
 @receiver(post_save, sender=User)
 def criar_profile(sender, instance, created, **kwargs):

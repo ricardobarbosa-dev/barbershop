@@ -668,6 +668,21 @@ section#card p {
     box-shadow: 0 8px 20px rgba(77, 255, 92, 0.25);
 }
 
+
+.warning {
+    border-left: 5px solid #dc3545;
+    background: linear-gradient(135deg, #ff4d4d, #b30000);
+    color: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    max-width: 90%;
+    margin-bottom: 2rem;
+    margin: 0 auto;
+    border-radius: 1rem;
+}
+
 .group-layout .input-with-icon {
     overflow: hidden;
     white-space: nowrap;
@@ -1306,7 +1321,6 @@ span.flatpickr-weekday {
     font-size: 14px;
     line-height: 1;
     margin: 0;
-    /* Garante que o ícone não tenha margens próprias */
 }
 
 
@@ -1314,6 +1328,10 @@ span.flatpickr-weekday {
 @media (min-width: 1024px) {
     body {
         display: flex;
+    }
+
+    .warning {
+        max-width: 1400px;
     }
 
     .sidebar {

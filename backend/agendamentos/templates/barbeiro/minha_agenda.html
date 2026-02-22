@@ -31,12 +31,13 @@
             </form>
           </div>
 
-          <button type="button" class="btn-bloquear" id="openModal"><i class="fas fa-ban"></i> Bloquear</button>
+          <button type="button" class="btn-bloquear" id="openModal">Bloquear</button>
         </div>
       </header>
 
       <div class="agenda-content">
-        {# --- SEÇÃO 1: AGENDAMENTOS ABERTOS (PENDENTE / AGENDADO / BLOQUEIOS) --- #}
+        <span class="section-label"><i class="fas fa-clock"></i> VER LISTA DE DEVEDORES</span>
+        <button class="btn-primary"><a href="{% url 'lista_devedores' %}">Lista</a></button>
         <span class="section-label"><i class="fas fa-clock"></i> AGENDAMENTOS EM ABERTO</span>
 
         {% for agendamento in agendamentos %}
@@ -78,7 +79,6 @@
                   {% if agendamento.E_BLOQUEIO %}
                     <a href="{% url 'remover_bloqueio' agendamento.id %}" class="btn-action-list danger btn-confirmar-acao" data-titulo="Remover Bloqueio?"><i class="fas fa-trash"></i></a>
                   {% else %}
-                    {# Ações para Pendentes ou Agendados #}
                     <a href="{% url 'concluir_agendamento' agendamento.id %}" class="btn-action-list success" title="Concluir Atendimento"><i class="fas fa-check"></i></a>
                     <a href="{% url 'atualizar_status_agendamento' agendamento.id 'CANCELADO' %}" class="btn-action-list danger btn-confirmar-acao" data-titulo="Cancelar?" data-icon="warning"><i class="fas fa-times"></i></a>
                   {% endif %}
@@ -90,7 +90,6 @@
 
         <br /><br />
 
-        {# --- SEÇÃO 2: HISTÓRICO (CONCLUÍDO / CANCELADO) --- #}
         <span class="section-label"><i class="fas fa-history"></i> HISTÓRICO (FINALIZADOS)</span>
 
         {% for agendamento in agendamentos %}
@@ -134,7 +133,6 @@
     </section>
   </div>
 
-  {# MODAL DE BLOQUEIO #}
   <div class="custom-modal" id="modalBloqueio">
     <div class="modal-container">
       <form action="{% url 'bloquear_agenda' %}" method="POST">

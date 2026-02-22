@@ -1,6 +1,23 @@
+// Elementos Globais
 const sino = document.querySelector(".notifications");
 const dropdown = document.getElementById("dropdown-notificacoes");
 const badge = document.getElementById("badge");
+
+// Função para buscar Cookie CSRF (Django)
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
 
 async function carregarNotificacoes() {
     if (!dropdown || !badge) return;
@@ -37,15 +54,14 @@ async function carregarNotificacoes() {
         `;
 
         data.forEach(n => {
-            // Define a cor da borda esquerda baseada no tipo da notificação
-            let corDestaque = '#ffcc00'; // Padrão (Amarelo)
+            let corDestaque = '#ffcc00';
             let icone = '🔔';
 
             if (n.tipo === 'CANCELADO') {
-                corDestaque = '#e74c3c'; // Vermelho para cancelamento
+                corDestaque = '#e74c3c';
                 icone = '❌';
             } else if (n.tipo === 'CONCLUIDO') {
-                corDestaque = '#2ecc71'; // Verde para concluído
+                corDestaque = '#2ecc71';
                 icone = '✅';
             }
 
@@ -120,42 +136,108 @@ function adicionarCliqueIndividual() {
     });
 }
 
-document.addEventListener("click", (e) => {
-    if (sino && dropdown) {
-        if (!sino.contains(e.target) && !dropdown.contains(e.target)) {
-            dropdown.style.display = "none";
-        }
+// Inicialização de Eventos
+document.addEventListener('DOMContentLoaded', function () {
+
+    // 1. Polling de Notificações
+    if (badge) {
+        setInterval(carregarNotificacoes, 20000);
+        carregarNotificacoes();
     }
+
+    // 2. Toggle do Dropdown do Sino
+    if (sino && dropdown) {
+        sino.addEventListener("click", (e) => {
+            e.stopPropagation();
+            dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+        });
+
+        document.addEventListener("click", (e) => {
+            if (!sino.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.style.display = "none";
+            }
+        });
+    }
+
+    // 3. Verificação de Segurança para SweetAlert2 (Swal)
+    if (typeof Swal === 'undefined') {
+        console.warn("Aviso: SweetAlert2 não foi carregado. As confirmações usarão alertas padrão.");
+    }
+
+    // 4. Botoes de Confirmação Geral (Link <a>)
+    const botoesConfirmacao = document.querySelectorAll('.btn-confirmar-acao');
+    botoesConfirmacao.forEach(botao => {
+        botao.addEventListener('click', function (e) {
+            e.preventDefault();
+            const url = this.getAttribute('href');
+            const titulo = this.getAttribute('data-titulo') || 'Tem certeza?';
+            const texto = this.getAttribute('data-texto') || 'Você não poderá reverter isso!';
+            const icone = this.getAttribute('data-icon') || 'question';
+
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: titulo,
+                    text: texto,
+                    icon: icone,
+                    showCancelButton: true,
+                    confirmButtonColor: '#f1c40f',
+                    cancelButtonColor: '#1a1a1a',
+                    confirmButtonText: 'Sim, confirmar!',
+                    cancelButtonText: 'Voltar',
+                    background: '#161616',
+                    color: '#ffffff'
+                }).then((result) => {
+                    if (result.isConfirmed) window.location.href = url;
+                });
+            } else {
+                if (confirm(texto)) window.location.href = url;
+            }
+        });
+    });
+
+    // 5. Formulário de Cancelamento Inteligente (Regra dos 30min)
+    document.querySelectorAll('.form-cancelamento').forEach(form => {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const agendamentoDataStr = this.getAttribute('data-horario');
+            const agendamentoHora = new Date(agendamentoDataStr);
+            const agora = new Date();
+            const diferencaMinutos = (agendamentoHora - agora) / (1000 * 60);
+
+            let titulo = 'Confirmar cancelamento?';
+            let texto = 'Deseja realmente cancelar seu agendamento?';
+            let icon = 'question';
+
+            if (diferencaMinutos <= 30) {
+                titulo = 'Atenção: Taxa de Cancelamento!';
+                texto = 'Você está cancelando faltando menos de 30 minutos. Uma taxa de R$ 15,00 será gerada em seu perfil.';
+                icon = 'warning';
+            }
+
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: titulo,
+                    text: texto,
+                    icon: icon,
+                    showCancelButton: true,
+                    confirmButtonColor: icon === 'warning' ? '#e74c3c' : '#f1c40f',
+                    cancelButtonColor: '#1a1a1a',
+                    confirmButtonText: 'Sim, cancelar',
+                    cancelButtonText: 'Voltar',
+                    background: '#161616',
+                    color: '#fff'
+                }).then((result) => {
+                    if (result.isConfirmed) this.submit();
+                });
+            } else {
+                if (confirm(texto)) this.submit();
+            }
+        });
+    });
 });
 
-if (sino && dropdown) {
-    sino.addEventListener("click", (e) => {
-        e.stopPropagation();
-        dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
-    });
-}
-
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
-if (badge) {
-    setInterval(carregarNotificacoes, 20000);
-    carregarNotificacoes();
-}
-
-// dropdown sistema (ações da tabela)
+// Funções de Dropdown de Tabelas (Ellipsis)
 function toggleDropdown(id) {
     document.querySelectorAll('.dropdown-content').forEach(d => {
         if (d.id !== 'dropdown-' + id) d.classList.remove('show');
@@ -169,37 +251,3 @@ window.onclick = function (event) {
         document.querySelectorAll('.dropdown-content').forEach(d => d.classList.remove('show'));
     }
 }
-
-// SweetAlert2 para Confirmação de Ações (Ex: Cancelar)
-document.addEventListener('DOMContentLoaded', function () {
-    const botoesConfirmacao = document.querySelectorAll('.btn-confirmar-acao');
-
-    botoesConfirmacao.forEach(botao => {
-        botao.addEventListener('click', function (e) {
-            e.preventDefault();
-
-            const url = this.getAttribute('href');
-            const titulo = this.getAttribute('data-titulo') || 'Tem certeza?';
-            const texto = this.getAttribute('data-texto') || 'Você não poderá reverter isso!';
-            const icone = this.getAttribute('data-icon') || 'question';
-
-            Swal.fire({
-                title: titulo,
-                text: texto,
-                icon: icone,
-                showCancelButton: true,
-                confirmButtonColor: '#f1c40f',
-                cancelButtonColor: '#1a1a1a',
-                confirmButtonText: 'Sim, confirmar!',
-                cancelButtonText: 'Voltar',
-                background: '#161616',
-                color: '#ffffff',
-                border: '1px solid #333'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = url;
-                }
-            });
-        });
-    });
-});

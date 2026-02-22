@@ -128,13 +128,12 @@
         </div>
 
         <div class="form-actions-premium">
-          <button type="submit" class="btn-save-premium">SALVAR ALTERAÇÕES</button>
+          <button type="submit" class="btn-save-premium">SALVAR</button>
           <a href="{% url 'dashboard_barbeiro' %}" class="btn-cancel-premium">CANCELAR</a>
         </div>
       </form>
-      <hr style="border: 0; border-top: 1px solid #333; margin: 40px 0;" />
 
-      <h4 class="section-subtitle">MINHAS FOTOS ATUAIS</h4>
+      <h4 class="section-subtitle">GALERIA DE FOTOS</h4>
       <div class="gallery-edit-grid">
         {% for foto in perfil.gallery.all %}
           <div class="photo-container">

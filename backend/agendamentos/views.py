@@ -7,9 +7,12 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import datetime, timedelta
 from django.urls import reverse
+from decimal import Decimal
 import json
 # models
 from .models import Agendamento, NivelFidelidade, PacoteCorte, Avaliacao, DisponibilidadeBarbeiro, BloqueioAgenda
+from accounts.models import Profile
+from notificacoes.models import Notificacao
 from servicos.models import Servico
 from barbeiros.models import Barbeiro
 from barbearia.models import ConfiguracaoBarbearia
@@ -90,19 +93,20 @@ def listar_agendamentos(request):
 
 @login_required
 def criar_agendamento(request):
+    # --- REGRA 1: BLOQUEIO DE DEVEDORES ---
+    if request.user.profile.saldo_devedor > 0:
+        messages.error(request, f'Você possui uma taxa pendente de R$ {request.user.profile.saldo_devedor}. Regularize na barbearia para agendar novamente.')
+        return redirect('listar_agendamentos')
+
     servicos = Servico.objects.all()
     barbeiros = Barbeiro.objects.filter(ativo=True)
-
-    # LÓGICA PARA DATAS LOTADAS
-    # Aqui contamos quantos agendamentos existem por data (excluindo os cancelados)
-    # Agrupamos por data e filtramos aquelas que atingiram um limite (ex: 15 atendimentos por dia no total)
     LIMITE_AGENDAMENTOS_DIARIOS = 15 
+    
     agendamentos_por_dia = Agendamento.objects.exclude(status='CANCELADO') \
         .values('data') \
         .annotate(total=Count('id')) \
         .filter(total__gte=LIMITE_AGENDAMENTOS_DIARIOS)
 
-    # Criamos uma lista de strings no formato 'YYYY-MM-DD' para o JavaScript
     datas_lotadas = [item['data'].strftime('%Y-%m-%d') for item in agendamentos_por_dia]
 
     if request.method == 'POST':
@@ -115,15 +119,24 @@ def criar_agendamento(request):
             messages.error(request, 'Por favor, preencha todos os campos.')
             return redirect('criar_agendamento')
 
-        # Verifica se o horário específico já existe para aquele barbeiro
-        existe = Agendamento.objects.filter(
+        ja_agendou_hoje = Agendamento.objects.filter(
+            cliente=request.user,
+            data=data
+        ).exclude(status='CANCELADO').exists()
+
+        if ja_agendou_hoje:
+            messages.error(request, f'Você já possui um agendamento para o dia {data}. É permitido apenas um agendamento por dia.')
+            return redirect('criar_agendamento')
+
+        # --- REGRA 3: VERIFICAÇÃO DE HORÁRIO OCUPADO (CHOQUE DE AGENDA) ---
+        existe_conflito = Agendamento.objects.filter(
             barbeiro_id=barbeiro_id,
             data=data,
             horario=horario
         ).exclude(status='CANCELADO').exists()
 
-        if existe:
-            messages.error(request, 'Este horário já está ocupado. Escolha outro.')
+        if existe_conflito:
+            messages.error(request, 'Este horário já está ocupado com este barbeiro. Escolha outro.')
             return redirect('criar_agendamento')
 
         try:
@@ -144,25 +157,79 @@ def criar_agendamento(request):
     return render(request, 'agendamentos/criar_agendamento.html', {
         'servicos': servicos,
         'barbeiros': barbeiros,
-        'datas_lotadas_json': json.dumps(datas_lotadas)  # Enviando para o template
+        'datas_lotadas_json': json.dumps(datas_lotadas)
     })
     
 @login_required
 def cancelar_agendamento(request, agendamento_id):
     agendamento = get_object_or_404(Agendamento, id=agendamento_id, cliente=request.user)
+    
     if request.method == "POST":
         if agendamento.status == 'PENDENTE':
+            agendamento_datetime = datetime.combine(agendamento.data, agendamento.horario)
+            agendamento_datetime = timezone.make_aware(agendamento_datetime)
+            
+            agora = timezone.now()
+            limite_taxa = agendamento_datetime - timedelta(minutes=30)
+
+            msg_adicional = ""
+            
+            if agora > limite_taxa:
+                valor_multa = Decimal('15.00')
+                perfil = request.user.profile
+                
+                perfil.saldo_devedor += valor_multa
+                perfil.save()
+                
+                msg_adicional = f" Uma taxa de R$ {valor_multa} foi aplicada por cancelamento tardio."
+
             agendamento.status = 'CANCELADO'
             agendamento.save()
+            
             Notificacao.objects.create(
-            usuario=agendamento.cliente, # Notifica o cliente
-            mensagem=f"Seu agendamento para o dia {agendamento.data.strftime('%d/%m')} foi cancelado.",
-            tipo='CANCELADO'
-        )
-            messages.success(request, 'Agendamento cancelado!')
+                usuario=agendamento.cliente,
+                mensagem=f"Seu agendamento para o dia {agendamento.data.strftime('%d/%m')} foi cancelado.{msg_adicional}",
+                tipo='CANCELADO'
+            )
+            
+            messages.warning(request, f'Agendamento cancelado!{msg_adicional}')
         else:
             messages.error(request, 'Este agendamento não pode ser cancelado.')
+            
     return redirect('listar_agendamentos')
+
+@login_required
+def lista_devedores(request):
+    if not request.user.is_staff:
+        messages.error(request, "Acesso negado. Apenas para funcionários.")
+        return redirect('dashboard_cliente')
+
+    devedores = Profile.objects.filter(saldo_devedor__gt=0).order_by('-saldo_devedor')
+    return render(request, 'agendamentos/devedores.html', {'devedores': devedores})
+
+@login_required
+def quitar_debito(request, cliente_id):
+    if not request.user.is_staff:
+        messages.error(request, "Acesso negado.")
+        return redirect('dashboard_cliente')
+
+    perfil_cliente = get_object_or_404(Profile, user_id=cliente_id)
+    
+    if request.method == "POST":
+        valor_pago = perfil_cliente.saldo_devedor
+        perfil_cliente.saldo_devedor = Decimal('0.00') 
+        perfil_cliente.save()
+        
+        Notificacao.objects.create(
+            usuario=perfil_cliente.user,
+            mensagem=f"Seu débito de R$ {valor_pago} foi quitado com sucesso!",
+            tipo='INFO'
+        )
+        
+        messages.success(request, f"Débito de {perfil_cliente.user.username} quitado!")
+    
+    return redirect('lista_devedores') 
+
 
 # ==========================================
 # VIEWS DO BARBEIRO (DASHBOARD E AGENDA)
