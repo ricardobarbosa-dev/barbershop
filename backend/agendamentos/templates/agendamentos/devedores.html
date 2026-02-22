@@ -55,7 +55,7 @@
               <div class="user-actions-list">
                 <form action="{% url 'quitar_debito' perfil.user.id %}" method="POST" class="form-quitar">
                   {% csrf_token %}
-                  <button type="submit" class="btn-action-list success btn-confirmar-pagamento" title="Marcar como Pago" data-nome="{{ perfil.user.get_full_name|default:perfil.user.username }}" data-valor="{{ perfil.saldo_devedor }}"><i class="fas fa-check"></i></button>
+                  <button type="submit" class="btn-action-list success btn-confirmar-pagamento" title="Marcar como Pago" data-nome="{{ perfil.user.get_full_name|default:perfil.user.username }}" data-valor="{{ perfil.saldo_devedor }}" style="cursor: pointer;"><i class="fas fa-check"></i></button>
                 </form>
               </div>
             </div>

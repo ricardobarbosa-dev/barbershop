@@ -93,7 +93,6 @@ def listar_agendamentos(request):
 
 @login_required
 def criar_agendamento(request):
-    # --- REGRA 1: BLOQUEIO DE DEVEDORES ---
     if request.user.profile.saldo_devedor > 0:
         messages.error(request, f'Você possui uma taxa pendente de R$ {request.user.profile.saldo_devedor}. Regularize na barbearia para agendar novamente.')
         return redirect('listar_agendamentos')
@@ -128,7 +127,6 @@ def criar_agendamento(request):
             messages.error(request, f'Você já possui um agendamento para o dia {data}. É permitido apenas um agendamento por dia.')
             return redirect('criar_agendamento')
 
-        # --- REGRA 3: VERIFICAÇÃO DE HORÁRIO OCUPADO (CHOQUE DE AGENDA) ---
         existe_conflito = Agendamento.objects.filter(
             barbeiro_id=barbeiro_id,
             data=data,
@@ -162,10 +160,14 @@ def criar_agendamento(request):
     
 @login_required
 def cancelar_agendamento(request, agendamento_id):
+    # Busca o agendamento garantindo que pertence ao usuário logado
     agendamento = get_object_or_404(Agendamento, id=agendamento_id, cliente=request.user)
     
     if request.method == "POST":
-        if agendamento.status == 'PENDENTE':
+        # Verifica se pode cancelar
+        if agendamento.status in ['PENDENTE', 'AGENDADO']:
+            
+            # Lógica de Horário para Taxa
             agendamento_datetime = datetime.combine(agendamento.data, agendamento.horario)
             agendamento_datetime = timezone.make_aware(agendamento_datetime)
             
@@ -175,24 +177,23 @@ def cancelar_agendamento(request, agendamento_id):
             msg_adicional = ""
             
             if agora > limite_taxa:
-                valor_multa = Decimal('15.00')
+                valor_multa = Decimal('10.00')
                 perfil = request.user.profile
-                
                 perfil.saldo_devedor += valor_multa
                 perfil.save()
-                
                 msg_adicional = f" Uma taxa de R$ {valor_multa} foi aplicada por cancelamento tardio."
 
-            agendamento.status = 'CANCELADO'
-            agendamento.save()
-            
+            # Criar notificação antes de deletar
             Notificacao.objects.create(
-                usuario=agendamento.cliente,
+                usuario=request.user,
                 mensagem=f"Seu agendamento para o dia {agendamento.data.strftime('%d/%m')} foi cancelado.{msg_adicional}",
                 tipo='CANCELADO'
             )
+
+            # DELETA para liberar a restrição UNIQUE no banco de dados
+            agendamento.delete()
             
-            messages.warning(request, f'Agendamento cancelado!{msg_adicional}')
+            messages.warning(request, f'Agendamento cancelado com sucesso!{msg_adicional}')
         else:
             messages.error(request, 'Este agendamento não pode ser cancelado.')
             
