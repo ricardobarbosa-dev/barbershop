@@ -153,5 +153,5 @@ Este sistema foi desenvolvido com foco em:
 
 ## 👨‍💻 Autor
 
-Desenvolvido por Ricardo Barbosa\
+Desenvolvido por Ricardo Barbosa
 
